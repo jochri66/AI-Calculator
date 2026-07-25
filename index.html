@@ -25,6 +25,7 @@
     <nav class="mode-tabs" role="tablist">
       <button id="tab-wizard" class="tab active" role="tab" aria-selected="true" data-i18n="tabs.wizard"></button>
       <button id="tab-expert" class="tab" role="tab" aria-selected="false" data-i18n="tabs.expert"></button>
+      <button id="tab-compare" class="tab" role="tab" aria-selected="false" data-i18n="tabs.compare"></button>
     </nav>
 
     <!-- ============ WIZARD ============ -->
@@ -33,6 +34,43 @@
 
       <form id="wizard-form">
         <fieldset class="wizard-step" data-step="0">
+          <legend data-i18n="wizard.step.industry.title"></legend>
+          <p class="step-desc" data-i18n="wizard.step.industry.desc"></p>
+          <div class="radio-grid">
+            <label class="radio-card">
+              <input type="radio" name="industry" value="individuell" checked>
+              <span class="rc-title" data-i18n="industry.individuell"></span>
+              <span class="rc-desc" data-i18n="industry.individuell.desc"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="industry" value="kanzlei">
+              <span class="rc-title" data-i18n="industry.kanzlei"></span>
+              <span class="rc-desc" data-i18n="industry.kanzlei.desc"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="industry" value="fertigung">
+              <span class="rc-title" data-i18n="industry.fertigung"></span>
+              <span class="rc-desc" data-i18n="industry.fertigung.desc"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="industry" value="agentur">
+              <span class="rc-title" data-i18n="industry.agentur"></span>
+              <span class="rc-desc" data-i18n="industry.agentur.desc"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="industry" value="gesundheit">
+              <span class="rc-title" data-i18n="industry.gesundheit"></span>
+              <span class="rc-desc" data-i18n="industry.gesundheit.desc"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="industry" value="handel">
+              <span class="rc-title" data-i18n="industry.handel"></span>
+              <span class="rc-desc" data-i18n="industry.handel.desc"></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="wizard-step" data-step="1" hidden>
           <legend data-i18n="wizard.step.users.title"></legend>
           <p class="step-desc" data-i18n="wizard.step.users.desc"></p>
           <div class="radio-grid">
@@ -63,7 +101,7 @@
           </label>
         </fieldset>
 
-        <fieldset class="wizard-step" data-step="1" hidden>
+        <fieldset class="wizard-step" data-step="2" hidden>
           <legend data-i18n="wizard.step.usecase.title"></legend>
           <p class="step-desc" data-i18n="wizard.step.usecase.desc"></p>
           <div class="mix-sliders">
@@ -102,29 +140,27 @@
           </div>
         </fieldset>
 
-        <fieldset class="wizard-step" data-step="2" hidden>
+        <fieldset class="wizard-step" data-step="3" hidden>
           <legend data-i18n="wizard.step.sov.title"></legend>
           <p class="step-desc" data-i18n="wizard.step.sov.desc"></p>
-          <div class="radio-grid">
-            <label class="radio-card">
-              <input type="radio" name="sovereignty" value="hard">
-              <span class="rc-title" data-i18n="sov.hard"></span>
-              <span class="rc-desc" data-i18n="sov.hard.desc"></span>
-            </label>
-            <label class="radio-card">
-              <input type="radio" name="sovereignty" value="preferred" checked>
-              <span class="rc-title" data-i18n="sov.pref"></span>
-              <span class="rc-desc" data-i18n="sov.pref.desc"></span>
-            </label>
-            <label class="radio-card">
-              <input type="radio" name="sovereignty" value="none">
-              <span class="rc-title" data-i18n="sov.none"></span>
-              <span class="rc-desc" data-i18n="sov.none.desc"></span>
-            </label>
+          <div class="mix-row sov-slider">
+            <div class="mix-head">
+              <span class="rc-title" id="sov-label" data-i18n-skip></span>
+              <output class="mix-value" id="sov-value">50%</output>
+            </div>
+            <input type="range" name="sovereigntyPct" id="sov-range" min="0" max="100" step="5" value="50">
+            <div class="sov-scale">
+              <span data-i18n="sov.scale.cloud"></span>
+              <span data-i18n="sov.scale.local"></span>
+            </div>
+          </div>
+          <div class="sov-explain">
+            <p><strong data-i18n="sov.explain.local.title"></strong> <span data-i18n="sov.explain.local"></span></p>
+            <p><strong data-i18n="sov.explain.cloud.title"></strong> <span data-i18n="sov.explain.cloud"></span></p>
           </div>
         </fieldset>
 
-        <fieldset class="wizard-step" data-step="3" hidden>
+        <fieldset class="wizard-step" data-step="4" hidden>
           <legend data-i18n="wizard.step.budget.title"></legend>
           <p class="step-desc" data-i18n="wizard.step.budget.desc"></p>
           <div class="radio-grid">
@@ -151,7 +187,7 @@
           </div>
         </fieldset>
 
-        <fieldset class="wizard-step" data-step="4" hidden>
+        <fieldset class="wizard-step" data-step="5" hidden>
           <legend data-i18n="wizard.step.quality.title"></legend>
           <p class="step-desc" data-i18n="wizard.step.quality.desc"></p>
           <div class="radio-grid">
@@ -208,6 +244,59 @@
           </label>
         </form>
         <div id="expert-output" class="expert-output"></div>
+      </div>
+    </section>
+
+    <!-- ============ CLOUD VS LOCAL ============ -->
+    <section id="compare" class="panel" hidden>
+      <h2 data-i18n="cmp.title"></h2>
+      <p class="step-desc" data-i18n="cmp.desc"></p>
+      <div class="compare-grid">
+        <form id="compare-form" class="expert-form">
+          <label>
+            <span data-i18n="cmp.seats"></span>
+            <input type="number" id="cmp-seats" min="1" max="5000" step="1" value="15" inputmode="numeric">
+          </label>
+          <label>
+            <span data-i18n="cmp.intensity"></span>
+            <select id="cmp-intensity">
+              <option value="light" data-i18n="cmp.intensity.light"></option>
+              <option value="normal" selected data-i18n="cmp.intensity.normal"></option>
+              <option value="heavy" data-i18n="cmp.intensity.heavy"></option>
+            </select>
+          </label>
+          <div class="mix-sliders compact">
+            <div class="mix-row">
+              <div class="mix-head">
+                <span class="rc-title" data-i18n="usecase.chat"></span>
+                <output class="mix-value" data-mix-out="chat">60%</output>
+              </div>
+              <input type="range" data-mix="chat" min="0" max="100" step="1" value="60">
+            </div>
+            <div class="mix-row">
+              <div class="mix-head">
+                <span class="rc-title" data-i18n="usecase.rag"></span>
+                <output class="mix-value" data-mix-out="rag">30%</output>
+              </div>
+              <input type="range" data-mix="rag" min="0" max="100" step="1" value="30">
+            </div>
+            <div class="mix-row">
+              <div class="mix-head">
+                <span class="rc-title" data-i18n="usecase.coding"></span>
+                <output class="mix-value" data-mix-out="coding">10%</output>
+              </div>
+              <input type="range" data-mix="coding" min="0" max="100" step="1" value="10">
+            </div>
+            <div class="mix-row">
+              <div class="mix-head">
+                <span class="rc-title" data-i18n="usecase.agentic"></span>
+                <output class="mix-value" data-mix-out="agentic">0%</output>
+              </div>
+              <input type="range" data-mix="agentic" min="0" max="100" step="1" value="0">
+            </div>
+          </div>
+        </form>
+        <div id="compare-output" class="expert-output"></div>
       </div>
     </section>
 

@@ -1,10 +1,11 @@
 // Console sanity suite — calibration anchors from real-world estimates.
 // Browser: open ?test=1. Node: `node js/selftest.js` (module check at bottom).
 
-import { MODELS, HARDWARE } from "./data.js";
+import { MODELS, HARDWARE, INDUSTRIES, CLOUD_PLANS } from "./data.js";
 import {
   weightsGB, capacity, singleStreamTokS, maxUsefulStreams,
-  usersServed, recommend,
+  usersServed, recommend, normalizeSovereignty, monthlyTokensPerSeat,
+  cloudComparison, hybridPlan,
 } from "./calc.js";
 
 const model = (id) => MODELS.find((m) => m.id === id);
@@ -88,6 +89,53 @@ export function run() {
   });
   check("Mixed 50/50 chat+agents -> 23 streams", rec4.needStreams === 23, String(rec4.needStreams));
   check("Mixed dominant use case resolves", ["chat", "agentic"].includes(rec4.useCase), rec4.useCase);
+
+  // --- Sovereignty slider: legacy strings map onto the 0-100 scale ---
+  check("Sovereignty 'hard' -> 100", normalizeSovereignty("hard") === 100);
+  check("Sovereignty 'none' -> 0", normalizeSovereignty("none") === 0);
+  check("Sovereignty 73 stays 73", normalizeSovereignty(73) === 73);
+
+  // --- Cloud comparison: pure chat, 15 seats ---
+  const chatTok = monthlyTokensPerSeat({ chat: 1 }, "normal");
+  check("Chat tokens/seat/mo = 12k x 21", chatTok.inTok + chatTok.outTok === 252000,
+    String(chatTok.inTok + chatTok.outTok));
+  const cmp1 = cloudComparison({ seats: 15, mix: { chat: 1 } });
+  const team = cmp1.options.find((o) => o.id === "chatgpt-team");
+  check("ChatGPT Team 3yr = seats x price x 36", team.year3 === 15 * 29 * 36, String(team.year3));
+  const gptApi = cmp1.options.find((o) => o.id === "api-gpt");
+  check("Light chat: API cheaper than seats", gptApi.monthly < team.monthly,
+    `api ${Math.round(gptApi.monthly)} vs team ${Math.round(team.monthly)}`);
+
+  // --- Agent-heavy mix: subscriptions flagged, API cost explodes ---
+  const cmpAg = cloudComparison({ seats: 15, mix: { agentic: 1 } });
+  check("Agent mix flags subscriptions", cmpAg.options.some((o) => o.flags.includes("agentsApi")));
+  const agApi = cmpAg.options.find((o) => o.id === "api-claude");
+  const chatApi = cmp1.options.find((o) => o.id === "api-claude");
+  check("Agent API cost >> chat API cost", agApi.monthly > chatApi.monthly * 20,
+    `${Math.round(agApi.monthly)} vs ${Math.round(chatApi.monthly)}`);
+
+  // --- Sovereignty >= 80 marks every cloud option ---
+  const cmpSov = cloudComparison({ seats: 10, mix: { chat: 1 }, sovereigntyPct: 90 });
+  check("Sov 90: all cloud options flagged noSov",
+    cmpSov.options.filter((o) => o.kind !== "selfhost").every((o) => o.flags.includes("noSov")));
+
+  // --- Hybrid: 40 users at 50% -> hardware for 20, split sums, cost adds up ---
+  const hy = hybridPlan({
+    users: 40, mix: { chat: 60, rag: 30, coding: 10, agentic: 0 },
+    sovereigntyPct: 50, budgetId: "b3", quality: "good",
+  });
+  check("Hybrid local users = ceil(40*0.5)", hy.localUsers === 20, String(hy.localUsers));
+  check("Hybrid split sums to 100", hy.split.localPct + hy.split.cloudPct === 100);
+  check("Hybrid monthly = local + cloud",
+    Math.abs(hy.monthly - (hy.local.monthly + hy.cloud.monthly)) < 0.01);
+  check("Hybrid absent at 100%",
+    hybridPlan({ users: 40, mix: { chat: 1 }, sovereigntyPct: 100, budgetId: "b3", quality: "good" }) === null);
+
+  // --- Industry preset: law firm = RAG-dominant + high sovereignty ---
+  const kanzlei = INDUSTRIES.find((p) => p.id === "kanzlei");
+  check("Kanzlei preset sovereignty >= 80", kanzlei.sovereigntyPct >= 80);
+  check("Kanzlei preset RAG-dominant",
+    Object.entries(kanzlei.mix).sort((a, b) => b[1] - a[1])[0][0] === "rag");
 
   const failed = results.filter((r) => !r.pass);
   console.log(`\nSelf-test: ${results.length - failed.length}/${results.length} passed`);

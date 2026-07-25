@@ -6,7 +6,11 @@
 //  3. Compute               — only matters with batching (10-20x throughput on GPUs).
 //  4. Interconnect          — penalty at multi-GPU scale, worst for MoE expert routing.
 
-import { QUANTS, USE_CASES, BUDGET_RANGES, MODELS, HARDWARE, TIER_RANK } from "./data.js";
+import {
+  QUANTS, USE_CASES, BUDGET_RANGES, MODELS, HARDWARE, TIER_RANK,
+  CLOUD_PLANS, API_RATES, TOKEN_PROFILES, INTENSITY, WORKDAYS_PER_MONTH,
+  KWH_EUR, UTILIZATION, AMORT_MONTHS, SEATS_PER_CONCURRENT,
+} from "./data.js";
 
 const MEM_HEADROOM = 0.92; // leave 8% for runtime/allocator
 
@@ -164,6 +168,15 @@ export function blendUseCases(mix) {
   };
 }
 
+// Sovereignty is a 0-100 slider ("share of AI usage that must run on own
+// hardware"). Legacy string values map onto the scale.
+export function normalizeSovereignty(v) {
+  if (typeof v === "number" && Number.isFinite(v)) {
+    return Math.min(100, Math.max(0, Math.round(v)));
+  }
+  return { hard: 100, preferred: 50, none: 0 }[v] ?? 50;
+}
+
 function tiersForQuality(quality, budgetIdx) {
   if (quality === "basic") return ["small", "mid"];
   if (quality === "good") return budgetIdx >= 2 ? ["mid", "large-moe"] : ["mid"];
@@ -191,9 +204,10 @@ export function recommend(answers) {
   const budgetIdx = BUDGET_RANGES.findIndex((b) => b.id === answers.budgetId);
   const budgetMax = BUDGET_RANGES[budgetIdx].max;
 
+  const sovPct = normalizeSovereignty(answers.sovereigntyPct ?? answers.sovereignty);
   const frontierOK =
     answers.quality === "best" &&
-    answers.sovereignty === "hard" &&
+    sovPct >= 80 &&
     budgetIdx >= 3;
 
   const tiers = tiersForQuality(answers.quality, budgetIdx);
@@ -284,7 +298,7 @@ export function recommend(answers) {
 
   // Assemble caveats.
   const caveats = new Set();
-  if (answers.sovereignty === "none") caveats.add("caveat.apiCheaper");
+  if (sovPct <= 20) caveats.add("caveat.apiCheaper");
   const shown = [primary, alternative, premium].filter(Boolean);
   for (const p of shown) {
     (p.cap?.flags || []).forEach((f) => caveats.add(f));
@@ -302,6 +316,7 @@ export function recommend(answers) {
     ctx,
     useCase: blend.dominant,
     mix,
+    sovereigntyPct: sovPct,
     users: answers.users,
     budgetMiss,
     capacityShort,
@@ -309,5 +324,116 @@ export function recommend(answers) {
     alternative: decorate(alternative),
     premium: decorate(premium),
     caveats: [...caveats],
+  };
+}
+
+// ---- cloud comparison (OpenAI / Anthropic / Google vs self-hosting) ----
+
+// Tokens per seat per month for a normalized mix at a given intensity.
+export function monthlyTokensPerSeat(mix, intensity = "normal") {
+  const m = normalizeMix(mix);
+  const factor = INTENSITY[intensity] ?? 1;
+  let inTok = 0;
+  let outTok = 0;
+  for (const [k, share] of Object.entries(m)) {
+    inTok += share * TOKEN_PROFILES[k].inTok;
+    outTok += share * TOKEN_PROFILES[k].outTok;
+  }
+  return {
+    inTok: inTok * WORKDAYS_PER_MONTH * factor,
+    outTok: outTok * WORKDAYS_PER_MONTH * factor,
+  };
+}
+
+// Self-host running cost: hardware amortized over AMORT_MONTHS + electricity.
+export function selfHostMonthly(hw) {
+  const price = (hw.priceEUR[0] + hw.priceEUR[1]) / 2;
+  const energy = ((hw.powerW * UTILIZATION * 24 * 365) / 12 / 1000) * KWH_EUR;
+  return {
+    hardware: price / AMORT_MONTHS,
+    energy,
+    monthly: price / AMORT_MONTHS + energy,
+  };
+}
+
+function horizons(monthly) {
+  return { monthly, year1: monthly * 12, year3: monthly * 36 };
+}
+
+// Full comparison: subscriptions + APIs (+ optional self-host row).
+// sovereigntyPct >= 80 marks every cloud option as violating the requirement.
+export function cloudComparison({ seats, mix, intensity = "normal", hw = null, sovereigntyPct = 0 }) {
+  const m = normalizeMix(mix);
+  const tokens = monthlyTokensPerSeat(m, intensity);
+  const noSov = normalizeSovereignty(sovereigntyPct) >= 80;
+  const agentsHeavy = m.agentic > 0.25;
+  const options = [];
+
+  if (hw) {
+    const sh = selfHostMonthly(hw);
+    options.push({
+      id: "selfhost", kind: "selfhost", provider: "", name: hw.name,
+      ...horizons(sh.monthly), flags: [],
+    });
+  }
+  for (const plan of CLOUD_PLANS) {
+    const flags = [...plan.flags];
+    if (agentsHeavy) flags.push("agentsApi");
+    if (noSov) flags.push("noSov");
+    options.push({
+      id: plan.id, kind: plan.kind, provider: plan.provider, name: plan.name,
+      ...horizons(seats * plan.priceEURMonth), flags,
+    });
+  }
+  for (const api of API_RATES) {
+    const monthly =
+      seats *
+      ((tokens.inTok / 1e6) * api.inEURPerMTok + (tokens.outTok / 1e6) * api.outEURPerMTok);
+    options.push({
+      id: api.id, kind: "api", provider: api.provider, name: api.name,
+      ...horizons(monthly), flags: noSov ? ["noSov"] : [],
+    });
+  }
+  return { tokens, options, agentsHeavy, noSov };
+}
+
+export function seatsFromConcurrent(users) {
+  return Math.max(1, Math.ceil(users * SEATS_PER_CONCURRENT));
+}
+
+// Hybrid plan for 0 < sovereigntyPct < 100: size hardware for the local share
+// of the workload, price the remaining share via the cheapest suitable cloud
+// option, and report the cost split.
+export function hybridPlan(answers) {
+  const sovPct = normalizeSovereignty(answers.sovereigntyPct ?? answers.sovereignty);
+  if (sovPct <= 0 || sovPct >= 100) return null;
+
+  const localUsers = Math.max(1, Math.ceil((answers.users * sovPct) / 100));
+  const cloudUsers = Math.max(0, answers.users - localUsers);
+  if (cloudUsers === 0) return null;
+
+  const rec = recommend({ ...answers, users: localUsers, sovereigntyPct: 100 });
+  if (!rec.primary) return null;
+
+  const cloudSeats = seatsFromConcurrent(cloudUsers);
+  const cmp = cloudComparison({ seats: cloudSeats, mix: answers.mix, sovereigntyPct: 0 });
+  // Agent-heavy mixes need the API; otherwise pick the cheapest seat/API option.
+  const candidates = cmp.options.filter((o) =>
+    cmp.agentsHeavy ? o.kind === "api" : o.kind === "seat" || o.kind === "api"
+  );
+  const cloud = candidates.sort((a, b) => a.monthly - b.monthly)[0];
+
+  const local = selfHostMonthly(rec.primary.hw);
+  const monthly = local.monthly + cloud.monthly;
+  return {
+    sovereigntyPct: sovPct,
+    localUsers, cloudUsers, cloudSeats,
+    rec, hw: rec.primary.hw,
+    local, cloud,
+    ...horizons(monthly),
+    split: {
+      localPct: Math.round((local.monthly / monthly) * 100),
+      cloudPct: 100 - Math.round((local.monthly / monthly) * 100),
+    },
   };
 }

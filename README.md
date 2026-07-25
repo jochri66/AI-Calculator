@@ -12,9 +12,18 @@ honest, physics-based estimates instead of marketing promises.
 - **Expert mode** — pick a model, quantization, context length and concurrency,
   and see live which hardware fits, plus memory breakdown and throughput
   estimates for every system in the catalog.
+- **Cloud vs. local** — honest cost comparison against ChatGPT (Plus/Team),
+  Claude (Pro/Max 5x/Max 20x/Team), Gemini, and pay-per-token APIs, derived
+  from the use-case mix; monthly / 1-year / 3-year views.
+- **Sovereignty slider & hybrid plans** — data sovereignty is a 0–100% share;
+  in between, the calculator proposes a hybrid split (sensitive workloads on
+  smaller local hardware, the rest via cloud) with the cost breakdown.
+- **Industry presets** — law firm, manufacturing, agency, healthcare, retail
+  presets prefill the sliders and sovereignty level.
 - **Honest by design** — every estimate is shown as a ±30% range; caveats
   (unbenchmarked MoE-over-PCIe routing, pending Kimi K3 benchmarks, "a cloud
-  API is cheaper without sovereignty requirements") are first-class output.
+  API is cheaper without sovereignty requirements", "closed frontier models
+  are currently stronger") are first-class output.
 
 ## The calculation model
 

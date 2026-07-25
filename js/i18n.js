@@ -11,6 +11,23 @@ export const STRINGS = {
 
     "tabs.wizard": "Bedarfs-Check",
     "tabs.expert": "Experten-Modus",
+    "tabs.compare": "Cloud vs. Lokal",
+
+    "wizard.step.industry.title": "In welcher Branche bist du unterwegs?",
+    "wizard.step.industry.desc":
+      "Optional — die Vorlage stellt Regler und Datensouveränität passend ein. Du kannst danach alles anpassen.",
+    "industry.individuell": "Individuell",
+    "industry.individuell.desc": "Keine Vorlage — du stellst alles selbst ein",
+    "industry.kanzlei": "Kanzlei & Recht",
+    "industry.kanzlei.desc": "Mandantendaten, viel Dokumentenarbeit → RAG-lastig, hohe Souveränität",
+    "industry.fertigung": "Fertigung & Zulieferer",
+    "industry.fertigung.desc": "Konstruktion, Code, Automatisierung → gemischter Betrieb",
+    "industry.agentur": "Agentur & Marketing",
+    "industry.agentur.desc": "Texte, Kampagnen, etwas Code → Cloud meist okay",
+    "industry.gesundheit": "Gesundheitswesen",
+    "industry.gesundheit.desc": "Patientendaten → hohe Souveränität, Chat + Wissensbasis",
+    "industry.handel": "Handel & E-Commerce",
+    "industry.handel.desc": "Support, Produktdaten, Automatisierung",
 
     "wizard.step.users.title": "Wie viele Leute nutzen die KI gleichzeitig?",
     "wizard.step.users.desc":
@@ -38,15 +55,20 @@ export const STRINGS = {
     "usecase.agentic.desc":
       "Autonome Workflows — Agenten belegen ihren Rechenstrom dauerhaft (1:1!)",
 
-    "wizard.step.sov.title": "Wie wichtig ist dir Datensouveränität?",
+    "wizard.step.sov.title": "Wie viel deiner KI-Nutzung muss auf eigener Hardware laufen?",
     "wizard.step.sov.desc":
-      "Ehrlich gesagt: Ohne harte Anforderungen ist eine Cloud-API oft die wirtschaftlichere Wahl.",
-    "sov.hard": "Harte Anforderung",
-    "sov.hard.desc": "Daten dürfen das Haus nicht verlassen (Regulierung, Verträge, Geheimschutz)",
-    "sov.pref": "Bevorzugt lokal",
-    "sov.pref.desc": "Lokal ist uns lieber, aber kein Muss",
-    "sov.none": "Flexibel",
-    "sov.none.desc": "Cloud wäre auch okay",
+      "Datensouveränität heißt: Deine Daten verlassen dein Haus nicht. Schieb den Regler auf den Anteil deiner Nutzung, der sensible Daten berührt — der Rest darf in die Cloud.",
+    "sov.scale.cloud": "0 % — alles Cloud",
+    "sov.scale.local": "100 % — alles lokal",
+    "sov.label.cloud": "Cloud ist okay",
+    "sov.label.mixed": "Hybrid: Sensibles lokal, Rest Cloud",
+    "sov.label.local": "Nichts verlässt das Haus",
+    "sov.explain.local.title": "Gehört auf eigene Hardware:",
+    "sov.explain.local":
+      "Mandanten- & Patientendaten, Verträge, Quellcode, Betriebsgeheimnisse — alles mit DSGVO-Risiko.",
+    "sov.explain.cloud.title": "Darf meist in die Cloud:",
+    "sov.explain.cloud":
+      "Generische Texte, öffentliche Recherche, Brainstorming, Marketing-Entwürfe.",
 
     "wizard.step.budget.title": "Welcher Budgetrahmen ist realistisch?",
     "wizard.step.budget.desc": "Einmalige Hardware-Investition (netto), ohne Betriebskosten.",
@@ -151,6 +173,40 @@ export const STRINGS = {
     "tier.large-moe": "Großes MoE-Modell",
     "tier.frontier-moe": "Frontier-Modell",
 
+    "cmp.title": "Cloud vs. Lokal",
+    "cmp.desc":
+      "Was kosten ChatGPT, Claude & Gemini im Vergleich zu eigener Hardware? Team-Größe und Nutzung einstellen — die Balken rechnen live.",
+    "cmp.resultsTitle": "Zum Vergleich: Cloud statt eigener Hardware",
+    "cmp.seats": "Team-Größe (Lizenzen)",
+    "cmp.intensity": "Nutzungsintensität",
+    "cmp.intensity.light": "Leicht (ab und zu)",
+    "cmp.intensity.normal": "Normal (täglich)",
+    "cmp.intensity.heavy": "Intensiv (Dauereinsatz)",
+    "cmp.horizon.monthly": "Monatlich",
+    "cmp.horizon.year1": "1 Jahr",
+    "cmp.horizon.year3": "3 Jahre",
+    "cmp.selfhost": "Eigene Hardware",
+    "cmp.perMonth": "/Monat",
+    "cmp.assumptions":
+      "Annahmen: {seats} Lizenzen, ca. {mtok} Mio. Token pro Kopf und Monat, 21 Arbeitstage. Eigene Hardware: Anschaffung auf 36 Monate umgelegt + Strom (0,30 €/kWh). Listenpreise Stand {date}, netto, gerundet.",
+    "cmp.caveat.quality":
+      "Fairerweise: Die geschlossenen Frontier-Modelle (GPT, Claude, Gemini) sind aktuell stärker als lokale Modelle derselben Preisklasse.",
+    "cmp.caveat.seats": "Annahme: ca. 3 Lizenzen je gleichzeitigem Nutzer.",
+    "cmp.flag.capped": "Nutzungslimits — bei Dauerlast wirst du gedrosselt",
+    "cmp.flag.noSov":
+      "Erfüllt deine Souveränitäts-Anforderung nicht — Daten gehen zu US-Anbietern",
+    "cmp.flag.perPerson": "Einzelplan pro Person, laut AGB nicht teilbar",
+    "cmp.flag.agentsApi":
+      "Für Agenten-Dauerbetrieb ungeeignet — dafür brauchst du API oder eigene Hardware",
+
+    "hybrid.badge": "Hybrid-Vorschlag",
+    "hybrid.headline": "{local} % lokal + {cloud} % Cloud",
+    "hybrid.local": "Lokal",
+    "hybrid.cloud": "Cloud",
+    "hybrid.users": "Nutzer",
+    "hybrid.note":
+      "Sensible Daten bleiben im Haus auf kleinerer (günstigerer) Hardware — der unkritische Rest läuft über die Cloud. Oft der beste Deal.",
+
     "cta.title": "Bock, das umzusetzen?",
     "cta.body":
       "Zwei Leute, ein Projekt: Einer baut die Hardware, einer bringt KI in Unternehmen. Schreib uns einfach — wir schauen uns dein Szenario unverbindlich an.",
@@ -173,6 +229,23 @@ export const STRINGS = {
 
     "tabs.wizard": "Needs check",
     "tabs.expert": "Expert mode",
+    "tabs.compare": "Cloud vs. local",
+
+    "wizard.step.industry.title": "What industry are you in?",
+    "wizard.step.industry.desc":
+      "Optional — the preset dials in the sliders and data sovereignty for you. You can change everything afterwards.",
+    "industry.individuell": "Custom",
+    "industry.individuell.desc": "No preset — you set everything yourself",
+    "industry.kanzlei": "Law firm & legal",
+    "industry.kanzlei.desc": "Client data, heavy document work → RAG-focused, high sovereignty",
+    "industry.fertigung": "Manufacturing & suppliers",
+    "industry.fertigung.desc": "Engineering, code, automation → mixed workloads",
+    "industry.agentur": "Agency & marketing",
+    "industry.agentur.desc": "Copy, campaigns, some code → cloud is usually fine",
+    "industry.gesundheit": "Healthcare",
+    "industry.gesundheit.desc": "Patient data → high sovereignty, chat + knowledge base",
+    "industry.handel": "Retail & e-commerce",
+    "industry.handel.desc": "Support, product data, automation",
 
     "wizard.step.users.title": "How many people will use the AI at the same time?",
     "wizard.step.users.desc":
@@ -200,15 +273,20 @@ export const STRINGS = {
     "usecase.agentic.desc":
       "Autonomous workflows — agents hold their stream continuously (1:1!)",
 
-    "wizard.step.sov.title": "How important is data sovereignty to you?",
+    "wizard.step.sov.title": "How much of your AI usage must run on your own hardware?",
     "wizard.step.sov.desc":
-      "Honestly: without hard requirements, a cloud API is often the more economical choice.",
-    "sov.hard": "Hard requirement",
-    "sov.hard.desc": "Data must not leave the premises (regulation, contracts, confidentiality)",
-    "sov.pref": "Prefer local",
-    "sov.pref.desc": "We'd rather run locally, but it's not a must",
-    "sov.none": "Flexible",
-    "sov.none.desc": "Cloud would be fine too",
+      "Data sovereignty means: your data never leaves your premises. Set the slider to the share of your usage that touches sensitive data — the rest can go to the cloud.",
+    "sov.scale.cloud": "0% — all cloud",
+    "sov.scale.local": "100% — all local",
+    "sov.label.cloud": "Cloud is fine",
+    "sov.label.mixed": "Hybrid: sensitive local, rest cloud",
+    "sov.label.local": "Nothing leaves the premises",
+    "sov.explain.local.title": "Belongs on your own hardware:",
+    "sov.explain.local":
+      "Client & patient data, contracts, source code, trade secrets — anything with GDPR risk.",
+    "sov.explain.cloud.title": "Usually fine in the cloud:",
+    "sov.explain.cloud":
+      "Generic copy, public research, brainstorming, marketing drafts.",
 
     "wizard.step.budget.title": "What budget range is realistic?",
     "wizard.step.budget.desc": "One-off hardware investment (net), excluding running costs.",
@@ -312,6 +390,40 @@ export const STRINGS = {
     "tier.mid": "Mid-size",
     "tier.large-moe": "Large MoE model",
     "tier.frontier-moe": "Frontier model",
+
+    "cmp.title": "Cloud vs. local",
+    "cmp.desc":
+      "What do ChatGPT, Claude & Gemini cost compared to your own hardware? Set team size and usage — the bars recalculate live.",
+    "cmp.resultsTitle": "For comparison: cloud instead of your own hardware",
+    "cmp.seats": "Team size (licenses)",
+    "cmp.intensity": "Usage intensity",
+    "cmp.intensity.light": "Light (now and then)",
+    "cmp.intensity.normal": "Normal (daily)",
+    "cmp.intensity.heavy": "Heavy (constant use)",
+    "cmp.horizon.monthly": "Monthly",
+    "cmp.horizon.year1": "1 year",
+    "cmp.horizon.year3": "3 years",
+    "cmp.selfhost": "Own hardware",
+    "cmp.perMonth": "/month",
+    "cmp.assumptions":
+      "Assumptions: {seats} licenses, ~{mtok}M tokens per person per month, 21 working days. Own hardware: purchase amortized over 36 months + power (€0.30/kWh). List prices as of {date}, net, rounded.",
+    "cmp.caveat.quality":
+      "To be fair: the closed frontier models (GPT, Claude, Gemini) are currently stronger than local models in the same price class.",
+    "cmp.caveat.seats": "Assumption: ~3 licenses per concurrent user.",
+    "cmp.flag.capped": "Usage limits — sustained load gets you throttled",
+    "cmp.flag.noSov":
+      "Does not meet your sovereignty requirement — data goes to US providers",
+    "cmp.flag.perPerson": "Individual plan per person, not shareable per ToS",
+    "cmp.flag.agentsApi":
+      "Unsuitable for continuous agent workloads — you need the API or your own hardware",
+
+    "hybrid.badge": "Hybrid suggestion",
+    "hybrid.headline": "{local}% local + {cloud}% cloud",
+    "hybrid.local": "Local",
+    "hybrid.cloud": "Cloud",
+    "hybrid.users": "users",
+    "hybrid.note":
+      "Sensitive data stays in-house on smaller (cheaper) hardware — the non-critical rest runs via the cloud. Often the best deal.",
 
     "cta.title": "Ready to build this?",
     "cta.body":

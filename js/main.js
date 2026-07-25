@@ -1,11 +1,14 @@
-// Entry point: language, tabs, wizard flow, expert mode.
+// Entry point: language, tabs, wizard flow, expert mode, cloud comparison.
 
-import { initLang, setLang, getLang, applyTranslations } from "./i18n.js";
-import { renderWizardResults, rerenderResults, initExpert } from "./ui.js";
+import { INDUSTRIES } from "./data.js";
+import { initLang, setLang, getLang, applyTranslations, t } from "./i18n.js";
+import { renderWizardResults, rerenderResults, initExpert, renderCompareTab } from "./ui.js";
 
-const STEPS = 5;
+const STEPS = 6;
 let currentStep = 0;
 let expertApi = null;
+let wizardSliders = null;
+let compareSliders = null;
 let resultsShown = false;
 
 const $ = (id) => document.getElementById(id);
@@ -20,7 +23,7 @@ function showStep(n) {
     "data-i18n",
     n === STEPS - 1 ? "wizard.show" : "wizard.next"
   );
-  applyTranslations($("wizard").parentElement ? $("wizard") : document);
+  applyTranslations($("wizard"));
   renderProgress();
 }
 
@@ -32,32 +35,27 @@ function renderProgress() {
 }
 
 function collectAnswers() {
-  const form = $("wizard-form");
-  const fd = new FormData(form);
+  const fd = new FormData($("wizard-form"));
   const custom = Number(fd.get("usersCustom"));
-  const mix = {};
-  document.querySelectorAll("[data-mix]").forEach((el) => {
-    mix[el.dataset.mix] = Number(el.value) || 0;
-  });
   return {
     users: custom > 0 ? custom : Number(fd.get("users")),
-    mix,
-    sovereignty: fd.get("sovereignty"),
+    mix: wizardSliders.values(),
+    sovereigntyPct: Number($("sov-range").value),
     budgetId: fd.get("budgetId"),
     quality: fd.get("quality"),
   };
 }
 
-// Auto-balancing sliders: the four shares always sum to 100%. Dragging one
-// slider redistributes the remainder across the others, proportional to their
-// current values (equal split when the others are all at zero).
-function initMixSliders() {
-  const sliders = [...document.querySelectorAll("[data-mix]")];
+// Auto-balancing sliders scoped to a container: the four shares always sum
+// to 100%. Dragging one slider redistributes the remainder across the others.
+function initMixSliders(root, onChange) {
+  const sliders = [...root.querySelectorAll("[data-mix]")];
 
   const paint = () => {
     sliders.forEach((el) => {
       el.style.setProperty("--pct", `${el.value}%`);
-      document.querySelector(`[data-mix-out="${el.dataset.mix}"]`).textContent = `${el.value}%`;
+      const out = root.querySelector(`[data-mix-out="${el.dataset.mix}"]`);
+      if (out) out.textContent = `${el.value}%`;
     });
   };
 
@@ -68,7 +66,6 @@ function initMixSliders() {
     const rest = 100 - v;
     const sumOthers = others.reduce((s, el) => s + Number(el.value), 0);
 
-    // Float shares -> floors, then hand out leftover points by largest fraction.
     const raw = others.map((el) =>
       sumOthers > 0 ? (Number(el.value) / sumOthers) * rest : rest / others.length
     );
@@ -81,12 +78,46 @@ function initMixSliders() {
 
     others.forEach((el, i) => { el.value = String(floors[i]); });
     paint();
+    if (onChange) onChange();
   };
 
-  sliders.forEach((el) =>
-    el.addEventListener("input", () => rebalance(el))
-  );
+  sliders.forEach((el) => el.addEventListener("input", () => rebalance(el)));
   paint();
+
+  return {
+    paint,
+    values: () => {
+      const out = {};
+      sliders.forEach((el) => { out[el.dataset.mix] = Number(el.value); });
+      return out;
+    },
+    set: (mix) => {
+      sliders.forEach((el) => { el.value = String(mix[el.dataset.mix] ?? 0); });
+      paint();
+      if (onChange) onChange();
+    },
+  };
+}
+
+// Sovereignty slider: gradient fill + live label.
+function paintSovereignty() {
+  const el = $("sov-range");
+  const v = Number(el.value);
+  el.style.setProperty("--pct", `${v}%`);
+  $("sov-value").textContent = `${v}%`;
+  const key = v <= 20 ? "sov.label.cloud" : v >= 80 ? "sov.label.local" : "sov.label.mixed";
+  $("sov-label").textContent = t(key);
+}
+
+// Industry preset: prefill mix sliders + sovereignty; user can change everything later.
+function applyIndustry(id) {
+  const preset = INDUSTRIES.find((p) => p.id === id);
+  if (!preset) return;
+  if (preset.mix) wizardSliders.set(preset.mix);
+  if (preset.sovereigntyPct != null) {
+    $("sov-range").value = String(preset.sovereigntyPct);
+    paintSovereignty();
+  }
 }
 
 function showResults() {
@@ -106,14 +137,28 @@ function restartWizard() {
 }
 
 function activateTab(which) {
-  const wizardActive = which === "wizard";
-  $("tab-wizard").classList.toggle("active", wizardActive);
-  $("tab-expert").classList.toggle("active", !wizardActive);
-  $("tab-wizard").setAttribute("aria-selected", String(wizardActive));
-  $("tab-expert").setAttribute("aria-selected", String(!wizardActive));
-  $("expert").hidden = wizardActive;
-  $("wizard").hidden = !wizardActive || resultsShown;
-  $("wizard-results").hidden = !wizardActive || !resultsShown;
+  const tabs = { wizard: $("tab-wizard"), expert: $("tab-expert"), compare: $("tab-compare") };
+  Object.entries(tabs).forEach(([name, btn]) => {
+    btn.classList.toggle("active", name === which);
+    btn.setAttribute("aria-selected", String(name === which));
+  });
+  $("expert").hidden = which !== "expert";
+  $("compare").hidden = which !== "compare";
+  $("wizard").hidden = which !== "wizard" || resultsShown;
+  $("wizard-results").hidden = which !== "wizard" || !resultsShown;
+  if (which === "compare") {
+    // start the tab from the wizard's current mix
+    compareSliders.set(wizardSliders.values());
+    updateCompare();
+  }
+}
+
+function updateCompare() {
+  renderCompareTab($("compare-output"), {
+    seats: Math.max(1, Number($("cmp-seats").value) || 1),
+    intensity: $("cmp-intensity").value,
+    mix: compareSliders.values(),
+  });
 }
 
 function updateLangToggle() {
@@ -124,21 +169,32 @@ function init() {
   initLang();
   applyTranslations();
   updateLangToggle();
+
+  wizardSliders = initMixSliders($("wizard"));
+  compareSliders = initMixSliders($("compare"), () => updateCompare());
   showStep(0);
-  initMixSliders();
+  paintSovereignty();
   expertApi = initExpert();
+
+  $("sov-range").addEventListener("input", paintSovereignty);
+  document.querySelectorAll('input[name="industry"]').forEach((el) =>
+    el.addEventListener("change", () => applyIndustry(el.value))
+  );
 
   $("lang-toggle").addEventListener("click", () => {
     setLang(getLang() === "de" ? "en" : "de", () => {
       updateLangToggle();
       showStep(currentStep);
+      paintSovereignty();
       rerenderResults();
       if (expertApi) { expertApi.syncQuants(); expertApi.render(); }
+      if (!$("compare").hidden) updateCompare();
     });
   });
 
   $("tab-wizard").addEventListener("click", () => activateTab("wizard"));
   $("tab-expert").addEventListener("click", () => activateTab("expert"));
+  $("tab-compare").addEventListener("click", () => activateTab("compare"));
 
   $("wizard-next").addEventListener("click", () => {
     if (currentStep < STEPS - 1) showStep(currentStep + 1);
@@ -147,6 +203,9 @@ function init() {
   $("wizard-back").addEventListener("click", () => {
     if (currentStep > 0) showStep(currentStep - 1);
   });
+
+  $("cmp-seats").addEventListener("input", updateCompare);
+  $("cmp-intensity").addEventListener("change", updateCompare);
 
   document.addEventListener("wizard:restart", restartWizard);
 

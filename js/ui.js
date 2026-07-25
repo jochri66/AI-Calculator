@@ -1,10 +1,10 @@
 // Rendering: wizard results, expert mode. All text through t() so language
 // switches can re-render live.
 
-import { MODELS, HARDWARE, QUANTS, USE_CASES } from "./data.js";
+import { MODELS, HARDWARE, QUANTS, USE_CASES, PRICING_ASOF } from "./data.js";
 import {
   weightsGB, kvGBPerStream, overheadGB, usableMemGB, activeGBPerToken,
-  capacity, recommend,
+  capacity, recommend, cloudComparison, hybridPlan, seatsFromConcurrent,
 } from "./calc.js";
 import { t, fmtEUR, fmtNum } from "./i18n.js";
 
@@ -83,10 +83,130 @@ export function renderWizardResults(container, answers) {
     )}</p>
     ${missNote}
     ${cards}
+    ${hybridCard(answers)}
     ${caveats}
+    <div class="cmp-section" data-cmp></div>
     ${controlsRow()}`;
   wireRestart(container);
   wireShare(container, rec);
+
+  renderComparison(container.querySelector("[data-cmp]"), {
+    titleKey: "cmp.resultsTitle",
+    seats: seatsFromConcurrent(rec.users),
+    mix: answers.mix,
+    intensity: "normal",
+    hw: rec.primary?.hw ?? null,
+    sovereigntyPct: rec.sovereigntyPct,
+  });
+}
+
+/* ============ cloud comparison ============ */
+
+function flagBadges(flags) {
+  return flags
+    .map((f) => `<span class="badge" title="${esc(t(`cmp.flag.${f}`))}">!</span>`)
+    .join("");
+}
+
+export function renderComparison(container, opts, horizon) {
+  horizon = horizon || container.dataset.horizon || "monthly";
+  container.dataset.horizon = horizon;
+  const cmp = cloudComparison(opts);
+  const max = Math.max(...cmp.options.map((o) => o[horizon]));
+
+  const pills = ["monthly", "year1", "year3"]
+    .map(
+      (h) => `<button type="button" class="cmp-pill ${h === horizon ? "active" : ""}" data-horizon="${h}">
+        ${esc(t(`cmp.horizon.${h}`))}</button>`
+    )
+    .join("");
+
+  const rows = cmp.options
+    .map((o) => {
+      const dim = o.flags.includes("noSov") ? " dim" : "";
+      const self = o.kind === "selfhost" ? " self" : "";
+      const label = o.kind === "selfhost" ? t("cmp.selfhost") : o.name;
+      return `
+        <div class="cmp-row${dim}${self}">
+          <div class="cmp-name">${esc(label)}${o.kind === "selfhost" ? "" : flagBadges(o.flags)}</div>
+          <div class="cmp-bar">
+            <div class="cmp-fill" style="width:${Math.max(1.5, (o[horizon] / max) * 100)}%"></div>
+            <span class="cmp-val">${esc(fmtEUR(Math.round(o[horizon])))}</span>
+          </div>
+        </div>`;
+    })
+    .join("");
+
+  const caveats = [
+    t("cmp.caveat.quality"),
+    t("cmp.caveat.seats"),
+    ...(cmp.noSov ? [t("cmp.flag.noSov")] : []),
+    ...(cmp.agentsHeavy ? [t("cmp.flag.agentsApi")] : []),
+  ];
+
+  container.innerHTML = `
+    ${opts.titleKey ? `<h3>${esc(t(opts.titleKey))}</h3>` : ""}
+    <div class="cmp-horizon">${pills}</div>
+    <div class="cmp-rows">${rows}</div>
+    <p class="cmp-assume">${esc(
+      t("cmp.assumptions", {
+        seats: fmtNum(opts.seats),
+        mtok: fmtNum((cmp.tokens.inTok + cmp.tokens.outTok) / 1e6, 1),
+        date: PRICING_ASOF,
+      })
+    )}</p>
+    <ul class="cmp-caveats">${caveats.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>`;
+
+  container.querySelectorAll("[data-horizon]").forEach((btn) =>
+    btn.addEventListener("click", () => renderComparison(container, opts, btn.dataset.horizon))
+  );
+}
+
+// Standalone "Cloud vs. Local" tab: auto-picks a matching self-host config
+// for the given seat count so the comparison always has a hardware row.
+export function renderCompareTab(container, { seats, intensity, mix }) {
+  const rec = recommend({
+    users: Math.max(1, Math.ceil(seats / 3)),
+    mix,
+    sovereigntyPct: 100,
+    budgetId: "b5",
+    quality: "good",
+  });
+  renderComparison(
+    container,
+    { seats, intensity, mix, hw: rec.primary?.hw ?? null, sovereigntyPct: 0 },
+    container.dataset.horizon
+  );
+}
+
+function hybridCard(answers) {
+  const h = hybridPlan(answers);
+  if (!h) return "";
+  return `
+    <div class="result-card hybrid">
+      <span class="result-badge">${esc(t("hybrid.badge"))}</span>
+      <div class="result-headline">${esc(
+        t("hybrid.headline", { local: h.sovereigntyPct, cloud: 100 - h.sovereigntyPct })
+      )}</div>
+      <div class="result-sub">${esc(h.rec.primary.model.name)} · ${esc(h.hw.name)} + ${esc(h.cloud.name)}</div>
+      <div class="split-bar" aria-hidden="true">
+        <div class="split-local" style="width:${h.split.localPct}%"></div>
+        <div class="split-cloud" style="width:${h.split.cloudPct}%"></div>
+      </div>
+      <div class="mem-legend">
+        <span><span class="swatch" style="background:var(--seg-weights)"></span>${esc(t("hybrid.local"))}: ${esc(fmtEUR(Math.round(h.local.monthly)))}${esc(t("cmp.perMonth"))} (${fmtNum(h.localUsers)} ${esc(t("hybrid.users"))})</span>
+        <span><span class="swatch" style="background:var(--seg-overhead)"></span>${esc(t("hybrid.cloud"))}: ${esc(fmtEUR(Math.round(h.cloud.monthly)))}${esc(t("cmp.perMonth"))} (${fmtNum(h.cloudUsers)} ${esc(t("hybrid.users"))})</span>
+      </div>
+      <div class="stat-grid" style="margin-top:0.8rem">
+        <div class="stat"><div class="label">${esc(t("cmp.horizon.monthly"))}</div>
+          <div class="value">${esc(fmtEUR(Math.round(h.monthly)))}</div></div>
+        <div class="stat"><div class="label">${esc(t("cmp.horizon.year1"))}</div>
+          <div class="value">${esc(fmtEUR(Math.round(h.year1)))}</div></div>
+        <div class="stat"><div class="label">${esc(t("cmp.horizon.year3"))}</div>
+          <div class="value">${esc(fmtEUR(Math.round(h.year3)))}</div></div>
+      </div>
+      <p class="rc-desc" style="margin-top:0.6rem">${esc(t("hybrid.note"))}</p>
+    </div>`;
 }
 
 function controlsRow() {

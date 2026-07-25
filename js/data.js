@@ -204,3 +204,62 @@ export const HARDWARE = [
     instances: 1, redundant: false, noteKeys: ["hw.note.production"],
   },
 ];
+
+// ---- cloud comparison data (list prices, net, rounded; verify periodically) ----
+
+export const PRICING_ASOF = "07/2026";
+
+// Per-seat / per-person subscription prices, EUR/month.
+// flags: capped = usage limits; perPerson = individual plan, not shareable (ToS)
+export const CLOUD_PLANS = [
+  { id: "chatgpt-plus", provider: "OpenAI", name: "ChatGPT Plus", priceEURMonth: 23, kind: "person", flags: ["capped"] },
+  { id: "chatgpt-team", provider: "OpenAI", name: "ChatGPT Team", priceEURMonth: 29, kind: "seat", flags: ["capped"] },
+  { id: "claude-pro", provider: "Anthropic", name: "Claude Pro", priceEURMonth: 21, kind: "person", flags: ["capped"] },
+  { id: "claude-max5", provider: "Anthropic", name: "Claude Max 5x", priceEURMonth: 90, kind: "person", flags: ["capped", "perPerson"] },
+  { id: "claude-max20", provider: "Anthropic", name: "Claude Max 20x", priceEURMonth: 180, kind: "person", flags: ["capped", "perPerson"] },
+  { id: "claude-team", provider: "Anthropic", name: "Claude Team", priceEURMonth: 27, kind: "seat", flags: ["capped"] },
+  { id: "gemini-pro", provider: "Google", name: "Google AI Pro (Gemini)", priceEURMonth: 22, kind: "person", flags: ["capped"] },
+];
+
+// Pay-per-token API rates, EUR per million tokens (approx., converted from USD).
+export const API_RATES = [
+  { id: "api-gpt", provider: "OpenAI", name: "OpenAI API (GPT-Klasse)", inEURPerMTok: 1.15, outEURPerMTok: 9.2 },
+  { id: "api-claude", provider: "Anthropic", name: "Anthropic API (Claude Sonnet)", inEURPerMTok: 2.75, outEURPerMTok: 13.8 },
+  { id: "api-gemini", provider: "Google", name: "Google API (Gemini Pro)", inEURPerMTok: 1.15, outEURPerMTok: 9.2 },
+];
+
+// Tokens per active user per working day, by use case (in/out).
+export const TOKEN_PROFILES = {
+  chat: { inTok: 8e3, outTok: 4e3 },
+  rag: { inTok: 40e3, outTok: 4e3 },
+  coding: { inTok: 60e3, outTok: 15e3 },
+  agentic: { inTok: 500e3, outTok: 100e3 },
+};
+
+export const INTENSITY = { light: 0.5, normal: 1, heavy: 2 };
+export const WORKDAYS_PER_MONTH = 21;
+
+// Self-host running-cost assumptions
+export const KWH_EUR = 0.3;
+export const UTILIZATION = 0.4;   // average load share
+export const AMORT_MONTHS = 36;   // hardware amortization horizon
+export const SEATS_PER_CONCURRENT = 3; // team seats per concurrent user (assumption)
+
+// Industry presets: prefill mix sliders + sovereignty. null = no prefill.
+export const INDUSTRIES = [
+  { id: "individuell", mix: null, sovereigntyPct: null },
+  { id: "kanzlei", mix: { chat: 20, rag: 70, coding: 0, agentic: 10 }, sovereigntyPct: 90 },
+  { id: "fertigung", mix: { chat: 25, rag: 25, coding: 30, agentic: 20 }, sovereigntyPct: 50 },
+  { id: "agentur", mix: { chat: 50, rag: 20, coding: 25, agentic: 5 }, sovereigntyPct: 20 },
+  { id: "gesundheit", mix: { chat: 40, rag: 55, coding: 0, agentic: 5 }, sovereigntyPct: 90 },
+  { id: "handel", mix: { chat: 40, rag: 25, coding: 10, agentic: 25 }, sovereigntyPct: 40 },
+];
+
+// Typical inference power draw per system (W) for energy cost estimates.
+const POWER_W = {
+  "rtx4090": 600, "rtx5090": 750, "rtx6000-ada": 500, "rtxpro6000": 700,
+  "dual-rtxpro6000": 1100, "mac-m3ultra": 250, "mac-cluster": 1000,
+  "epyc-milan-1tb": 500, "epyc-turin-dual": 800, "server-4x-pro6000": 2500,
+  "node-8x-pro6000": 4500, "cluster-3node": 10000, "cluster-8x-mi325x": 8000,
+};
+HARDWARE.forEach((h) => { h.powerW = POWER_W[h.id] ?? 500; });
