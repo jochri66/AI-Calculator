@@ -10,10 +10,60 @@ import {
 import { t, fmtEUR, fmtNum } from "./i18n.js";
 
 // Comparison view state shared between wizard results and the compare tab.
-const cmpState = { horizon: "monthly", country: "de" };
+// amortYears 0 = hardware paid 100% upfront (default); 1-5 = financed.
+const cmpState = { horizon: "monthly", country: "de", amortYears: 0 };
 
 function getKwh() {
   return (COUNTRIES.find((c) => c.id === cmpState.country) || COUNTRIES[0]).kwhEUR;
+}
+
+function amortMonths() {
+  return cmpState.amortYears * 12;
+}
+
+function finText() {
+  return cmpState.amortYears === 0
+    ? t("fin.upfront")
+    : t("fin.years", { n: cmpState.amortYears });
+}
+
+function finSliderHTML() {
+  return `
+    <div class="fin-slider">
+      <div class="mix-head">
+        <span class="fin-label">${esc(t("fin.label"))}</span>
+        <output class="mix-value">${esc(finText())}</output>
+      </div>
+      <input type="range" data-fin min="0" max="5" step="1" value="${cmpState.amortYears}"
+        style="--pct:${(cmpState.amortYears / 5) * 100}%">
+    </div>`;
+}
+
+function wireFinSlider(container, refresh) {
+  const el = container.querySelector("[data-fin]");
+  if (!el) return;
+  el.addEventListener("change", () => {
+    cmpState.amortYears = Number(el.value);
+    refresh();
+  });
+  el.addEventListener("input", () => {
+    el.style.setProperty("--pct", `${(Number(el.value) / 5) * 100}%`);
+  });
+}
+
+// Self-host cost line that makes the payment model explicit.
+function selfHostBreakdown(o) {
+  if (o.upfront > 0) {
+    return t("cmpsum.upfrontLine", {
+      price: fmtEUR(Math.round(o.upfront)),
+      energy: fmtEUR(Math.round(o.energy)),
+    });
+  }
+  return t("cmpsum.financedLine", {
+    hw: fmtEUR(Math.round(o.hwShare)),
+    energy: fmtEUR(Math.round(o.energy)),
+    n: cmpState.amortYears,
+  });
 }
 
 const CTX_STOPS = [4096, 8192, 16384, 32768, 65536, 131072];
@@ -117,7 +167,7 @@ export function renderWizardResults(container, answers) {
 // Compact summary for the results page: own hardware vs the cheapest
 // subscription vs the cheapest API, plus one plain-language verdict.
 function renderCloudSummary(container, opts) {
-  const cmp = cloudComparison({ ...opts, kwhEUR: getKwh() });
+  const cmp = cloudComparison({ ...opts, kwhEUR: getKwh(), amortMonths: amortMonths() });
   const self = cmp.options.find((o) => o.kind === "selfhost");
   const subs = cmp.options.filter((o) => o.kind === "seat" || o.kind === "person");
   const apis = cmp.options.filter((o) => o.kind === "api");
@@ -125,17 +175,18 @@ function renderCloudSummary(container, opts) {
   const cheapApi = [...apis].sort((a, b) => a.monthly - b.monthly)[0];
 
   const rows = [
-    self ? { label: t("cmp.selfhost"), name: opts.hw.name, value: self.monthly, self: true } : null,
-    { label: t("cmpsum.sub"), name: cheapSub.name, value: cheapSub.monthly, self: false },
-    { label: t("cmpsum.api"), name: cheapApi.name, value: cheapApi.monthly, self: false },
+    self
+      ? { label: t("cmp.selfhost"), sub: selfHostBreakdown(self), value: self.monthly, self: true }
+      : null,
+    { label: t("cmpsum.sub"), sub: cheapSub.name, value: cheapSub.monthly, self: false },
+    { label: t("cmpsum.api"), sub: cheapApi.name, value: cheapApi.monthly, self: false },
   ].filter(Boolean);
   const max = Math.max(...rows.map((r) => r.value));
 
   let verdict = "";
-  if (opts.hw) {
-    const sh = selfHostMonthlyView(opts.hw);
+  if (self) {
     const cloudBest = Math.min(cheapSub.monthly, cheapApi.monthly);
-    const saving = cloudBest - sh.energy;
+    const saving = cloudBest - self.energy;
     if (saving > 0) {
       const months = Math.ceil(((opts.hw.priceEUR[0] + opts.hw.priceEUR[1]) / 2) / saving);
       verdict = months <= 36
@@ -148,6 +199,7 @@ function renderCloudSummary(container, opts) {
 
   container.innerHTML = `
     <h3>${esc(t("cmpsum.title"))}</h3>
+    ${finSliderHTML()}
     <div class="cmpsum-rows">
       ${rows.map((r) => `
         <div class="cmpsum-row${r.self ? " self" : ""}">
@@ -156,7 +208,7 @@ function renderCloudSummary(container, opts) {
             <span class="cmpsum-val">${esc(fmtEUR(Math.round(r.value)))}${esc(t("cmp.perMonth"))}</span>
           </div>
           <div class="cmp-bar"><div class="cmp-fill" style="width:${Math.max(2, (r.value / max) * 100)}%"></div></div>
-          ${r.self ? "" : `<span class="cmpsum-name">${esc(r.name)}</span>`}
+          <span class="cmpsum-name">${esc(r.sub)}</span>
         </div>`).join("")}
     </div>
     ${verdict ? `<p class="cmpsum-verdict">${esc(verdict)}</p>` : ""}
@@ -167,12 +219,8 @@ function renderCloudSummary(container, opts) {
   container.querySelector('[data-action="open-compare"]').addEventListener("click", () => {
     container.dispatchEvent(new CustomEvent("open:compare", { bubbles: true }));
   });
-}
-
-function selfHostMonthlyView(hw) {
-  const price = (hw.priceEUR[0] + hw.priceEUR[1]) / 2;
-  const energy = powerKWhPerMonth(hw) * getKwh();
-  return { hardware: price / 36, energy, monthly: price / 36 + energy };
+  // Financing changes affect the hybrid card too — re-render the whole results.
+  wireFinSlider(container, () => rerenderResults());
 }
 
 /* ============ cloud comparison ============ */
@@ -187,7 +235,7 @@ function flagLabels(flags) {
 
 export function renderComparison(container, opts) {
   const horizon = cmpState.horizon;
-  const cmp = cloudComparison({ ...opts, kwhEUR: getKwh() });
+  const cmp = cloudComparison({ ...opts, kwhEUR: getKwh(), amortMonths: amortMonths() });
   const max = Math.max(...cmp.options.map((o) => o[horizon]));
 
   const pills = ["monthly", "year1", "year3"]
@@ -211,6 +259,10 @@ export function renderComparison(container, opts) {
       const dim = o.flags.includes("noSov") ? " dim" : "";
       const self = o.kind === "selfhost" ? " self" : "";
       const label = o.kind === "selfhost" ? t("cmp.selfhost") : o.name;
+      const subLine =
+        o.kind === "selfhost" && horizon === "monthly"
+          ? `<span class="cmpsum-name">${esc(selfHostBreakdown(o))}</span>`
+          : "";
       return `
         <div class="cmp-row${dim}${self}">
           <div class="cmp-name">${esc(label)}${o.kind === "selfhost" ? "" : flagLabels(o.flags)}</div>
@@ -218,6 +270,7 @@ export function renderComparison(container, opts) {
             <div class="cmp-fill" style="width:${Math.max(1.5, (o[horizon] / max) * 100)}%"></div>
             <span class="cmp-val">${esc(fmtEUR(Math.round(o[horizon])))}</span>
           </div>
+          ${subLine}
         </div>`;
     })
     .join("");
@@ -229,12 +282,16 @@ export function renderComparison(container, opts) {
     ...(cmp.agentsHeavy ? [t("cmp.flag.agentsApi")] : []),
   ];
 
+  const finNote =
+    cmpState.amortYears === 0 ? t("cmp.fin.upfrontNote") : t("cmp.fin.financedNote", { n: cmpState.amortYears });
+
   container.innerHTML = `
     ${opts.titleKey ? `<h3>${esc(t(opts.titleKey))}</h3>` : ""}
     <div class="cmp-controls">
       <div class="cmp-horizon">${pills}</div>
       ${countrySelect}
     </div>
+    ${opts.hw ? finSliderHTML() : ""}
     <div class="cmp-rows">${rows}</div>
     <p class="cmp-assume">${esc(
       t("cmp.assumptions", {
@@ -243,7 +300,7 @@ export function renderComparison(container, opts) {
         kwh: fmtNum(getKwh(), 2),
         date: PRICING_ASOF,
       })
-    )}</p>
+    )} ${esc(finNote)}</p>
     <ul class="cmp-caveats">${caveats.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>`;
 
   const refresh = opts.onRefresh || (() => renderComparison(container, opts));
@@ -257,6 +314,7 @@ export function renderComparison(container, opts) {
     cmpState.country = e.target.value;
     refresh();
   });
+  wireFinSlider(container, refresh);
 }
 
 // Standalone "Cloud vs. Local" tab: auto-picks a matching self-host config
@@ -277,8 +335,13 @@ export function renderCompareTab(container, { seats, intensity, mix }) {
 }
 
 function hybridCard(answers) {
-  const h = hybridPlan(answers, getKwh());
+  const h = hybridPlan(answers, getKwh(), amortMonths());
   if (!h) return "";
+  const upfrontLine = h.local.upfront > 0
+    ? `<p class="rc-desc" style="margin-top:0.4rem"><strong>${esc(
+        t("cmpsum.plusUpfront", { price: fmtEUR(Math.round(h.local.upfront)) })
+      )}</strong></p>`
+    : "";
   return `
     <div class="result-card hybrid">
       <span class="result-badge">${esc(t("hybrid.badge"))}</span>
@@ -302,6 +365,7 @@ function hybridCard(answers) {
         <div class="stat"><div class="label">${esc(t("cmp.horizon.year3"))}</div>
           <div class="value">${esc(fmtEUR(Math.round(h.year3)))}</div></div>
       </div>
+      ${upfrontLine}
       <p class="rc-desc" style="margin-top:0.6rem">${esc(t("hybrid.note"))}</p>
     </div>`;
 }

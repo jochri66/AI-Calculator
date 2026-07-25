@@ -74,7 +74,7 @@ export const STRINGS = {
     "wizard.step.budget.desc": "Einmalige Hardware-Investition (netto), ohne Betriebskosten.",
     "budget.b1": "bis 5.000 €",
     "budget.b2": "bis 15.000 €",
-    "budget.b3": "bis 60.000 €",
+    "budget.b3": "bis 70.000 €",
     "budget.b4": "bis 150.000 €",
     "budget.b5": "über 150.000 €",
 
@@ -130,7 +130,7 @@ export const STRINGS = {
     "caveat.apiCheaper":
       "Ohne harte Datensouveränitäts-Anforderung ist eine Cloud-API für die meisten Firmen deutlich günstiger als eigene Hardware. Rechne beides durch, bevor du investierst.",
     "caveat.midsizeCompare":
-      "Zum Vergleich: Ein Setup der 70B–235B-Klasse (~60.000 €) erledigt dieselben Aufgaben für die meisten Mittelständler — Frontier-Modelle lohnen sich nur bei harten Anforderungen und Premium-Budget.",
+      "Zum Vergleich: Ein Setup der 70B–235B-Klasse (~65.000 €) erledigt dieselben Aufgaben für die meisten Mittelständler — Frontier-Modelle lohnen sich nur bei harten Anforderungen und Premium-Budget.",
     "caveat.budgetMiss": "Die gezeigte Lösung liegt über deinem angegebenen Budget.",
     "caveat.capacityShort": "Der gezeigte Bedarf übersteigt die Kapazität von Standard-Systemen.",
 
@@ -223,7 +223,17 @@ export const STRINGS = {
     "cmp.selfhost": "Eigene Hardware",
     "cmp.perMonth": "/Monat",
     "cmp.assumptions":
-      "Annahmen: {seats} Lizenzen, ca. {mtok} Mio. Token pro Kopf und Monat, 21 Arbeitstage. Eigene Hardware: Anschaffung auf 36 Monate umgelegt + Strom ({kwh} €/kWh, Ø 40 % Auslastung). Listenpreise Stand {date}, netto, gerundet.",
+      "Annahmen: {seats} Lizenzen, ca. {mtok} Mio. Token pro Kopf und Monat, 21 Arbeitstage. Eigene Hardware: Strom {kwh} €/kWh bei Ø 40 % Auslastung. Preise Stand {date}, netto, gerundet.",
+    "fin.label": "Hardware-Bezahlung",
+    "fin.upfront": "100 % Anzahlung",
+    "fin.years": "Finanzierung: {n} Jahre",
+    "cmpsum.upfrontLine": "einmalig {price} Hardware — monatlich nur {energy} Strom",
+    "cmpsum.financedLine": "davon {hw} Hardware ({n} Jahre) + {energy} Strom",
+    "cmpsum.plusUpfront": "+ {price} einmalig für die Hardware",
+    "cmp.fin.upfrontNote":
+      "Hardware als Einmalzahlung — in den Monatskosten steckt nur der Strom.",
+    "cmp.fin.financedNote":
+      "Hardware auf {n} Jahre umgelegt und in den Monatskosten enthalten.",
     "cmp.caveat.quality":
       "Fairerweise: Die geschlossenen Frontier-Modelle (GPT, Claude, Gemini) sind aktuell stärker als lokale Modelle derselben Preisklasse.",
     "cmp.caveat.seats": "Annahme: ca. 3 Lizenzen je gleichzeitigem Nutzer.",
@@ -340,7 +350,7 @@ export const STRINGS = {
     "wizard.step.budget.desc": "One-off hardware investment (net), excluding running costs.",
     "budget.b1": "up to €5,000",
     "budget.b2": "up to €15,000",
-    "budget.b3": "up to €60,000",
+    "budget.b3": "up to €70,000",
     "budget.b4": "up to €150,000",
     "budget.b5": "above €150,000",
 
@@ -396,7 +406,7 @@ export const STRINGS = {
     "caveat.apiCheaper":
       "Without a hard data-sovereignty requirement, a cloud API is significantly cheaper for most companies than owning hardware. Run both numbers before investing.",
     "caveat.midsizeCompare":
-      "For comparison: a 70B–235B-class setup (~€60,000) does the same job for most SMBs — frontier models only pay off with hard requirements and a premium budget.",
+      "For comparison: a 70B–235B-class setup (~€65,000) does the same job for most SMBs — frontier models only pay off with hard requirements and a premium budget.",
     "caveat.budgetMiss": "The option shown is above your stated budget.",
     "caveat.capacityShort": "The stated demand exceeds the capacity of standard systems.",
 
@@ -489,7 +499,17 @@ export const STRINGS = {
     "cmp.selfhost": "Own hardware",
     "cmp.perMonth": "/month",
     "cmp.assumptions":
-      "Assumptions: {seats} licenses, ~{mtok}M tokens per person per month, 21 working days. Own hardware: purchase amortized over 36 months + power ({kwh} €/kWh, avg. 40% utilization). List prices as of {date}, net, rounded.",
+      "Assumptions: {seats} licenses, ~{mtok}M tokens per person per month, 21 working days. Own hardware: power at {kwh} €/kWh, avg. 40% utilization. Prices as of {date}, net, rounded.",
+    "fin.label": "Hardware payment",
+    "fin.upfront": "100% upfront",
+    "fin.years": "Financing: {n} years",
+    "cmpsum.upfrontLine": "{price} hardware once — only {energy} power per month",
+    "cmpsum.financedLine": "{hw} hardware ({n} yrs) + {energy} power",
+    "cmpsum.plusUpfront": "+ {price} one-time for the hardware",
+    "cmp.fin.upfrontNote":
+      "Hardware paid upfront — the monthly cost contains only power.",
+    "cmp.fin.financedNote":
+      "Hardware spread over {n} years and included in the monthly cost.",
     "cmp.caveat.quality":
       "To be fair: the closed frontier models (GPT, Claude, Gemini) are currently stronger than local models in the same price class.",
     "cmp.caveat.seats": "Assumption: ~3 licenses per concurrent user.",

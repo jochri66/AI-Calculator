@@ -350,16 +350,34 @@ export function powerKWhPerMonth(hw) {
   return (hw.powerW * UTILIZATION * 24 * 365) / 12 / 1000;
 }
 
-// Self-host running cost: hardware amortized over AMORT_MONTHS + electricity
-// at the given country's business rate.
-export function selfHostMonthly(hw, kwhEUR = KWH_EUR) {
+// Self-host running cost. Default: hardware paid 100% upfront, so the monthly
+// cost is electricity only and `upfront` carries the one-time price. With
+// amortMonths > 0 (financing over 1-5 years), the hardware share moves into
+// the monthly cost instead.
+export function selfHostMonthly(hw, kwhEUR = KWH_EUR, amortMonths = 0) {
   const price = (hw.priceEUR[0] + hw.priceEUR[1]) / 2;
   const energy = powerKWhPerMonth(hw) * kwhEUR;
+  const hardware = amortMonths > 0 ? price / amortMonths : 0;
   return {
-    hardware: price / AMORT_MONTHS,
+    hardware,
+    upfront: amortMonths > 0 ? 0 : price,
     energy,
     kwh: powerKWhPerMonth(hw),
-    monthly: price / AMORT_MONTHS + energy,
+    monthly: hardware + energy,
+  };
+}
+
+// Totals over 1 and 3 years, honestly counting the upfront payment (or the
+// financing installments actually paid within the horizon).
+export function selfHostHorizons(hw, kwhEUR = KWH_EUR, amortMonths = 0) {
+  const sh = selfHostMonthly(hw, kwhEUR, amortMonths);
+  const price = (hw.priceEUR[0] + hw.priceEUR[1]) / 2;
+  const paidBy = (months) =>
+    amortMonths > 0 ? Math.min(months, amortMonths) * (price / amortMonths) : price;
+  return {
+    ...sh,
+    year1: paidBy(12) + 12 * sh.energy,
+    year3: paidBy(36) + 36 * sh.energy,
   };
 }
 
@@ -369,7 +387,7 @@ function horizons(monthly) {
 
 // Full comparison: subscriptions + APIs (+ optional self-host row).
 // sovereigntyPct >= 80 marks every cloud option as violating the requirement.
-export function cloudComparison({ seats, mix, intensity = "normal", hw = null, sovereigntyPct = 0, kwhEUR = KWH_EUR }) {
+export function cloudComparison({ seats, mix, intensity = "normal", hw = null, sovereigntyPct = 0, kwhEUR = KWH_EUR, amortMonths = 0 }) {
   const m = normalizeMix(mix);
   const tokens = monthlyTokensPerSeat(m, intensity);
   const noSov = normalizeSovereignty(sovereigntyPct) >= 80;
@@ -377,10 +395,12 @@ export function cloudComparison({ seats, mix, intensity = "normal", hw = null, s
   const options = [];
 
   if (hw) {
-    const sh = selfHostMonthly(hw, kwhEUR);
+    const sh = selfHostHorizons(hw, kwhEUR, amortMonths);
     options.push({
       id: "selfhost", kind: "selfhost", provider: "", name: hw.name,
-      ...horizons(sh.monthly), flags: [],
+      monthly: sh.monthly, year1: sh.year1, year3: sh.year3,
+      upfront: sh.upfront, hwShare: sh.hardware, energy: sh.energy,
+      flags: [],
     });
   }
   for (const plan of CLOUD_PLANS) {
@@ -411,7 +431,7 @@ export function seatsFromConcurrent(users) {
 // Hybrid plan for 0 < sovereigntyPct < 100: size hardware for the local share
 // of the workload, price the remaining share via the cheapest suitable cloud
 // option, and report the cost split.
-export function hybridPlan(answers, kwhEUR = KWH_EUR) {
+export function hybridPlan(answers, kwhEUR = KWH_EUR, amortMonths = 0) {
   const sovPct = normalizeSovereignty(answers.sovereigntyPct ?? answers.sovereignty);
   if (sovPct <= 0 || sovPct >= 100) return null;
 
@@ -430,17 +450,20 @@ export function hybridPlan(answers, kwhEUR = KWH_EUR) {
   );
   const cloud = candidates.sort((a, b) => a.monthly - b.monthly)[0];
 
-  const local = selfHostMonthly(rec.primary.hw, kwhEUR);
+  const local = selfHostHorizons(rec.primary.hw, kwhEUR, amortMonths);
   const monthly = local.monthly + cloud.monthly;
+  const splitBase = Math.max(1, monthly);
   return {
     sovereigntyPct: sovPct,
     localUsers, cloudUsers, cloudSeats,
     rec, hw: rec.primary.hw,
     local, cloud,
-    ...horizons(monthly),
+    monthly,
+    year1: local.year1 + cloud.monthly * 12,
+    year3: local.year3 + cloud.monthly * 36,
     split: {
-      localPct: Math.round((local.monthly / monthly) * 100),
-      cloudPct: 100 - Math.round((local.monthly / monthly) * 100),
+      localPct: Math.round((local.monthly / splitBase) * 100),
+      cloudPct: 100 - Math.round((local.monthly / splitBase) * 100),
     },
   };
 }

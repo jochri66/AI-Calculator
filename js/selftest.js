@@ -148,7 +148,20 @@ export function run() {
   check("Energy cost scales with country rate",
     Math.abs(shDe.energy / shUs.energy - de.kwhEUR / us.kwhEUR) < 0.01,
     `de ${shDe.energy.toFixed(0)} vs us ${shUs.energy.toFixed(0)}`);
-  check("Hardware amortization country-independent", shDe.hardware === shUs.hardware);
+
+  // --- Financing model: upfront by default, hardware in monthly only when financed ---
+  const avgPrice = (server4x.priceEUR[0] + server4x.priceEUR[1]) / 2;
+  check("Default: monthly = energy only", shDe.monthly === shDe.energy && shDe.hardware === 0,
+    `monthly ${shDe.monthly.toFixed(0)}`);
+  check("Default: upfront = full price", shDe.upfront === avgPrice, String(shDe.upfront));
+  const fin3 = selfHostMonthly(server4x, de.kwhEUR, 36);
+  check("Financed 3yrs: monthly includes hardware/36",
+    Math.abs(fin3.monthly - (avgPrice / 36 + shDe.energy)) < 0.01 && fin3.upfront === 0,
+    fin3.monthly.toFixed(0));
+
+  // --- 10% margin baked into hardware prices ---
+  check("Margin: RTX 4090 price = 2420", hw("rtx4090").priceEUR[0] === 2420, String(hw("rtx4090").priceEUR[0]));
+  check("Margin: 4x server = 60500", server4x.priceEUR[0] === 60500, String(server4x.priceEUR[0]));
 
   const failed = results.filter((r) => !r.pass);
   console.log(`\nSelf-test: ${results.length - failed.length}/${results.length} passed`);

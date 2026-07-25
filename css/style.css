@@ -683,6 +683,15 @@ input[type="range"]::-moz-range-thumb {
   white-space: nowrap;
 }
 
+.fin-slider {
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 0.9rem;
+}
+.fin-label { font-weight: 700; font-size: 0.9rem; }
+
 /* compact summary on the results page */
 .cmpsum-rows { display: grid; gap: 0.8rem; }
 .cmpsum-head {

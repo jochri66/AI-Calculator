@@ -20,7 +20,7 @@ export const USE_CASES = {
 export const BUDGET_RANGES = [
   { id: "b1", max: 5000,     labelKey: "budget.b1" },
   { id: "b2", max: 15000,    labelKey: "budget.b2" },
-  { id: "b3", max: 60000,    labelKey: "budget.b3" },
+  { id: "b3", max: 70000,    labelKey: "budget.b3" },
   { id: "b4", max: 150000,   labelKey: "budget.b4" },
   { id: "b5", max: Infinity, labelKey: "budget.b5" },
 ];
@@ -272,3 +272,9 @@ export const COUNTRIES = [
   { id: "eu", kwhEUR: 0.25 },
   { id: "us", kwhEUR: 0.14 },
 ];
+
+// Sales margin applied to all hardware prices (procurement, assembly, support).
+export const MARGIN = 1.1;
+HARDWARE.forEach((h) => {
+  h.priceEUR = [Math.round((h.priceEUR[0] * MARGIN) / 10) * 10, Math.round((h.priceEUR[1] * MARGIN) / 10) * 10];
+});
