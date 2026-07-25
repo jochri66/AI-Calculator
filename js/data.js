@@ -193,6 +193,16 @@ export const HARDWARE = [
     priceCheck: "RTX PRO 6000 Blackwell Server", instances: 1, redundant: false, noteKeys: [],
   },
   {
+    // Enterprise OEM node (Dell/Supermicro class); price per node includes
+    // deployment and 36-month support. Networking/racks extra for multi-node.
+    id: "node-8x-h200", category: "gpu-node", name: "GPU server, 8x NVIDIA H200 SXM (1.1 TB HBM3e)",
+    priceEUR: [330000, 380000], memGB: 1128, memType: "vram",
+    bandwidthGBs: 3200, bandwidthEfficiency: 0.65,
+    maxBatchBoost: 16, maxStreams: 24, interconnect: "fabric",
+    priceCheck: "NVIDIA H200", instances: 1, redundant: false,
+    noteKeys: ["hw.note.production", "hw.note.enterprise"],
+  },
+  {
     id: "cluster-3node", category: "gpu-cluster", name: "Redundant cluster, 3x (8x RTX PRO 6000), 2 active + 1 spare",
     priceEUR: [380000, 420000], memGB: 768, memType: "vram",
     bandwidthGBs: 2500, bandwidthEfficiency: 0.65,
@@ -263,7 +273,8 @@ const POWER_W = {
   "rtx4090": 600, "rtx5090": 750, "rtx6000-ada": 500, "rtxpro6000": 700,
   "dual-rtxpro6000": 1100, "mac-m3ultra": 250, "mac-cluster": 1000,
   "epyc-milan-1tb": 500, "epyc-turin-dual": 800, "server-4x-pro6000": 2500,
-  "node-8x-pro6000": 4500, "cluster-3node": 10000, "cluster-8x-mi325x": 8000,
+  "node-8x-pro6000": 4500, "node-8x-h200": 7500,
+  "cluster-3node": 10000, "cluster-8x-mi325x": 8000,
 };
 HARDWARE.forEach((h) => { h.powerW = POWER_W[h.id] ?? 500; });
 

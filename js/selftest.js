@@ -6,7 +6,7 @@ import {
   weightsGB, capacity, singleStreamTokS, maxUsefulStreams,
   usersServed, recommend, normalizeSovereignty, monthlyTokensPerSeat,
   cloudComparison, hybridPlan, selfHostMonthly, selfHostHorizons, powerKWhPerMonth,
-  redundancyEnergyFactor,
+  redundancyEnergyFactor, rebalanceMix,
 } from "./calc.js";
 
 const model = (id) => MODELS.find((m) => m.id === id);
@@ -188,6 +188,25 @@ export function run() {
   // --- Redundancy energy: cold spare off, hot spare doubles ---
   check("Cold spare: no extra energy", redundancyEnergyFactor("standby") === 0);
   check("Hot spare: doubles energy", redundancyEnergyFactor("full") === 1);
+
+  // --- Enterprise H200 node ---
+  const h200 = hw("node-8x-h200");
+  check("H200 node margined price = 363000", h200.priceEUR[0] === 363000, String(h200.priceEUR[0]));
+  const h200cap = capacity(k3, "q4", 8192, h200, 1);
+  check("H200 node fits K3 Q4", h200cap.fits, `footprint ${h200cap.footprint.toFixed(0)} GB`);
+  const h200TokS = singleStreamTokS(k3, "q4", h200);
+  const proNodeTokS = singleStreamTokS(k3, "q4", hw("node-8x-pro6000"));
+  check("H200 node faster than 8x PRO 6000 (NVLink, no PCIe penalty)",
+    h200TokS > proNodeTokS, `${h200TokS.toFixed(1)} vs ${proNodeTokS.toFixed(1)}`);
+
+  // --- Mix slider auto-balance: equal spread, clamping, un-stuck zeros ---
+  const sum = (a) => a.reduce((s, n) => s + n, 0);
+  const eq = rebalanceMix([49, 14, 37, 0], 3, 12);
+  check("Rebalance: equal spread moves every slider", eq.join() === "45,10,33,12", eq.join());
+  const cl = rebalanceMix([80, 10, 10, 0], 0, 95);
+  check("Rebalance: clamps at 0, sums to 100", sum(cl) === 100 && cl[0] === 95 && cl[3] === 0, cl.join());
+  const un = rebalanceMix([100, 0, 0, 0], 0, 40);
+  check("Rebalance: zero sliders come back up", un.join() === "40,20,20,20", un.join());
 
   const failed = results.filter((r) => !r.pass);
   console.log(`\nSelf-test: ${results.length - failed.length}/${results.length} passed`);

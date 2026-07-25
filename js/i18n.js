@@ -139,6 +139,7 @@ export const STRINGS = {
     "hw.note.used": "Gebrauchtgerät — günstigster Weg zu 1 TB RAM, aber langsam.",
     "hw.note.redundant": "Redundante Auslegung: 2 aktive Knoten + 1 Reserve, ausfallsicher.",
     "hw.note.production": "Produktionsreife Rechenzentrums-Lösung (Strom, Kühlung, Wartung einplanen).",
+    "hw.note.enterprise": "Enterprise-Klasse (OEM wie Dell/Supermicro): Preis pro Knoten inkl. Deployment und 36 Monate Support — Netzwerk, Switches und Racks kommen bei Multi-Node-Setups dazu.",
 
     "expert.title": "Experten-Modus",
     "expert.desc":
@@ -425,6 +426,7 @@ export const STRINGS = {
     "hw.note.used": "Used equipment — cheapest route to 1 TB RAM, but slow.",
     "hw.note.redundant": "Redundant design: 2 active nodes + 1 spare, fault-tolerant.",
     "hw.note.production": "Production-grade datacenter solution (plan for power, cooling, maintenance).",
+    "hw.note.enterprise": "Enterprise class (OEM like Dell/Supermicro): per-node price includes deployment and 36 months of support — networking, switches and racks are extra in multi-node setups.",
 
     "expert.title": "Expert mode",
     "expert.desc":

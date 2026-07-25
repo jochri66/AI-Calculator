@@ -350,6 +350,45 @@ export function powerKWhPerMonth(hw) {
   return (hw.powerW * UTILIZATION * 24 * 365) / 12 / 1000;
 }
 
+// Auto-balance for the usage-mix sliders: when one slider moves, spread the
+// difference EQUALLY over the others so every slider visibly reacts (a
+// proportional split lets big sliders swallow the whole delta and freezes
+// sliders at 0 forever — user-reported bug). Sliders clamp at 0; whatever a
+// clamped slider can't absorb carries over to the rest. Returns integers
+// summing to exactly 100.
+export function rebalanceMix(values, changedIdx, newValue) {
+  const v = Math.min(100, Math.max(0, Math.round(Number(newValue))));
+  const out = values.map(Number);
+  out[changedIdx] = v;
+  const others = out.map((_, i) => i).filter((i) => i !== changedIdx);
+  const rest = 100 - v;
+
+  let remaining = rest - others.reduce((s, i) => s + out[i], 0);
+  while (Math.abs(remaining) > 1e-9) {
+    const eligible = remaining < 0 ? others.filter((i) => out[i] > 0) : others;
+    if (!eligible.length) break;
+    const share = remaining / eligible.length;
+    let used = 0;
+    eligible.forEach((i) => {
+      const next = Math.max(0, out[i] + share);
+      used += next - out[i];
+      out[i] = next;
+    });
+    remaining -= used;
+    if (used === 0) break;
+  }
+
+  // Largest-remainder rounding so the others sum to exactly `rest`.
+  const floors = others.map((i) => Math.floor(out[i]));
+  let leftover = rest - floors.reduce((s, n) => s + n, 0);
+  others
+    .map((i, k) => ({ k, frac: out[i] - floors[k] }))
+    .sort((a, b) => b.frac - a.frac)
+    .forEach(({ k }) => { if (leftover > 0) { floors[k] += 1; leftover -= 1; } });
+  others.forEach((i, k) => { out[i] = floors[k]; });
+  return out;
+}
+
 // Extra energy multiplier of a redundancy level, relative to one system.
 // Cold spare ("standby") sits powered off on the shelf; a hot spare ("full")
 // runs alongside and doubles the energy bill.

@@ -1,6 +1,7 @@
 // Entry point: language, tabs, wizard flow, expert mode, cloud comparison.
 
 import { INDUSTRIES } from "./data.js";
+import { rebalanceMix } from "./calc.js";
 import { initLang, setLang, getLang, applyTranslations, t } from "./i18n.js";
 import { renderWizardResults, rerenderResults, initExpert, renderCompareTab } from "./ui.js";
 
@@ -61,23 +62,9 @@ function initMixSliders(root, onChange) {
   };
 
   const rebalance = (changed) => {
-    const v = Math.min(100, Math.max(0, Math.round(Number(changed.value))));
-    changed.value = String(v);
-    const others = sliders.filter((el) => el !== changed);
-    const rest = 100 - v;
-    const sumOthers = others.reduce((s, el) => s + Number(el.value), 0);
-
-    const raw = others.map((el) =>
-      sumOthers > 0 ? (Number(el.value) / sumOthers) * rest : rest / others.length
-    );
-    const floors = raw.map(Math.floor);
-    let leftover = rest - floors.reduce((s, n) => s + n, 0);
-    raw
-      .map((r, i) => ({ i, frac: r - floors[i] }))
-      .sort((a, b) => b.frac - a.frac)
-      .forEach(({ i }) => { if (leftover > 0) { floors[i] += 1; leftover -= 1; } });
-
-    others.forEach((el, i) => { el.value = String(floors[i]); });
+    const idx = sliders.indexOf(changed);
+    const balanced = rebalanceMix(sliders.map((el) => Number(el.value)), idx, changed.value);
+    sliders.forEach((el, i) => { el.value = String(balanced[i]); });
     paint();
     if (onChange) onChange();
   };
