@@ -153,9 +153,9 @@ export const STRINGS = {
 
     "cta.title": "Bock, das umzusetzen?",
     "cta.body":
-      "Dieser Rechner ist ein gemeinsames Projekt: Hardware-Expertise trifft KI-Beratung. Schreib uns auf Instagram — wir rechnen dein Szenario unverbindlich durch.",
-    "cta.role.hardware": "Der Hardware-Experte — plant und baut deine KI-Server, vom Workstation-Einstieg bis zum redundanten Cluster.",
-    "cta.role.coach": "KI-Beratung, der große Unternehmen vertrauen — Strategie und Einführung im Betrieb.",
+      "Zwei Leute, ein Projekt: Einer baut die Hardware, einer bringt KI in Unternehmen. Schreib uns einfach — wir schauen uns dein Szenario unverbindlich an.",
+    "cta.role.hardware": "Baut die Kisten, auf denen deine KI läuft — vom ersten Server bis zum Cluster. Ehrlich beraten statt überdimensioniert verkauft.",
+    "cta.role.coach": "Bringt KI in den Arbeitsalltag — ohne Buzzword-Bingo. Auch die Großen holen sich hier Rat.",
     "cta.follow": "Auf Instagram schreiben",
 
     "footer.joint": "Ein gemeinsames Projekt von",
@@ -315,9 +315,9 @@ export const STRINGS = {
 
     "cta.title": "Ready to build this?",
     "cta.body":
-      "This calculator is a joint project: hardware expertise meets AI consulting. DM us on Instagram — we'll run your scenario, no strings attached.",
-    "cta.role.hardware": "The hardware expert — designs and builds your AI servers, from workstation entry points to redundant clusters.",
-    "cta.role.coach": "AI consulting that big corporations trust — strategy and rollout for your business.",
+      "Two people, one project: one builds the hardware, one gets AI into companies. Just hit us up — we'll look at your scenario, no strings attached.",
+    "cta.role.hardware": "Builds the boxes your AI runs on — from first server to full cluster. Honest advice, no oversized upsells.",
+    "cta.role.coach": "Gets AI into everyday work — zero buzzword bingo. Even the big players come here for advice.",
     "cta.follow": "DM on Instagram",
 
     "footer.joint": "A joint project by",
