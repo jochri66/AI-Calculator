@@ -233,6 +233,19 @@ export const STRINGS = {
     "cmp.flag.perPerson": "Einzelplan pro Person, laut AGB nicht teilbar",
     "cmp.flag.agentsApi":
       "Für Agenten-Dauerbetrieb ungeeignet — dafür brauchst du API oder eigene Hardware",
+    "cmp.flagShort.capped": "Limits",
+    "cmp.flagShort.perPerson": "pro Person",
+    "cmp.flagShort.noSov": "nicht souverän",
+    "cmp.flagShort.agentsApi": "nicht für Agenten",
+
+    "cmpsum.title": "Und was würde die Cloud kosten?",
+    "cmpsum.sub": "Günstigstes Cloud-Abo",
+    "cmpsum.api": "Günstigste Cloud-API",
+    "cmpsum.breakeven":
+      "Kurz gesagt: Nach ca. {n} Monaten hat sich deine eigene Hardware bezahlt gemacht — danach zahlst du nur noch Strom.",
+    "cmpsum.cloudWins":
+      "Kurz gesagt: Bei deiner Nutzung bleibt die Cloud rechnerisch günstiger. Eigene Hardware lohnt sich hier vor allem, wenn deine Daten das Haus nicht verlassen dürfen.",
+    "cmpsum.details": "Alle Anbieter im Detail vergleichen",
 
     "hybrid.badge": "Hybrid-Vorschlag",
     "hybrid.headline": "{local} % lokal + {cloud} % Cloud",
@@ -486,6 +499,19 @@ export const STRINGS = {
     "cmp.flag.perPerson": "Individual plan per person, not shareable per ToS",
     "cmp.flag.agentsApi":
       "Unsuitable for continuous agent workloads — you need the API or your own hardware",
+    "cmp.flagShort.capped": "limits",
+    "cmp.flagShort.perPerson": "per person",
+    "cmp.flagShort.noSov": "not sovereign",
+    "cmp.flagShort.agentsApi": "not for agents",
+
+    "cmpsum.title": "And what would the cloud cost?",
+    "cmpsum.sub": "Cheapest cloud subscription",
+    "cmpsum.api": "Cheapest cloud API",
+    "cmpsum.breakeven":
+      "In short: after about {n} months your own hardware has paid for itself — from then on you only pay for power.",
+    "cmpsum.cloudWins":
+      "In short: at your usage level the cloud stays cheaper on paper. Own hardware pays off here mainly when your data must not leave the premises.",
+    "cmpsum.details": "Compare all providers in detail",
 
     "hybrid.badge": "Hybrid suggestion",
     "hybrid.headline": "{local}% local + {cloud}% cloud",

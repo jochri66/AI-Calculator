@@ -209,6 +209,10 @@ function init() {
   $("cmp-intensity").addEventListener("change", updateCompare);
 
   document.addEventListener("wizard:restart", restartWizard);
+  document.addEventListener("open:compare", () => {
+    activateTab("compare");
+    $("compare").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 
   // Console sanity suite: append ?test=1 to the URL.
   if (new URLSearchParams(location.search).get("test") === "1") {

@@ -103,24 +103,86 @@ export function renderWizardResults(container, answers) {
   wireRestart(container);
   wireShare(container, rec);
 
-  renderComparison(container.querySelector("[data-cmp]"), {
-    titleKey: "cmp.resultsTitle",
+  // Simple 3-line cloud summary at the very end; full detail lives in the
+  // "Cloud vs. Lokal" tab.
+  renderCloudSummary(container.querySelector("[data-cmp]"), {
     seats: seatsFromConcurrent(rec.users),
     mix: answers.mix,
     intensity: "normal",
     hw: rec.primary?.hw ?? null,
     sovereigntyPct: rec.sovereigntyPct,
-    // Country switch affects the power stat and hybrid card too — re-render all.
-    onRefresh: () => renderWizardResults(container, answers),
   });
+}
+
+// Compact summary for the results page: own hardware vs the cheapest
+// subscription vs the cheapest API, plus one plain-language verdict.
+function renderCloudSummary(container, opts) {
+  const cmp = cloudComparison({ ...opts, kwhEUR: getKwh() });
+  const self = cmp.options.find((o) => o.kind === "selfhost");
+  const subs = cmp.options.filter((o) => o.kind === "seat" || o.kind === "person");
+  const apis = cmp.options.filter((o) => o.kind === "api");
+  const cheapSub = [...subs].sort((a, b) => a.monthly - b.monthly)[0];
+  const cheapApi = [...apis].sort((a, b) => a.monthly - b.monthly)[0];
+
+  const rows = [
+    self ? { label: t("cmp.selfhost"), name: opts.hw.name, value: self.monthly, self: true } : null,
+    { label: t("cmpsum.sub"), name: cheapSub.name, value: cheapSub.monthly, self: false },
+    { label: t("cmpsum.api"), name: cheapApi.name, value: cheapApi.monthly, self: false },
+  ].filter(Boolean);
+  const max = Math.max(...rows.map((r) => r.value));
+
+  let verdict = "";
+  if (opts.hw) {
+    const sh = selfHostMonthlyView(opts.hw);
+    const cloudBest = Math.min(cheapSub.monthly, cheapApi.monthly);
+    const saving = cloudBest - sh.energy;
+    if (saving > 0) {
+      const months = Math.ceil(((opts.hw.priceEUR[0] + opts.hw.priceEUR[1]) / 2) / saving);
+      verdict = months <= 36
+        ? t("cmpsum.breakeven", { n: fmtNum(months) })
+        : t("cmpsum.cloudWins");
+    } else {
+      verdict = t("cmpsum.cloudWins");
+    }
+  }
+
+  container.innerHTML = `
+    <h3>${esc(t("cmpsum.title"))}</h3>
+    <div class="cmpsum-rows">
+      ${rows.map((r) => `
+        <div class="cmpsum-row${r.self ? " self" : ""}">
+          <div class="cmpsum-head">
+            <span class="cmpsum-label">${esc(r.label)}</span>
+            <span class="cmpsum-val">${esc(fmtEUR(Math.round(r.value)))}${esc(t("cmp.perMonth"))}</span>
+          </div>
+          <div class="cmp-bar"><div class="cmp-fill" style="width:${Math.max(2, (r.value / max) * 100)}%"></div></div>
+          ${r.self ? "" : `<span class="cmpsum-name">${esc(r.name)}</span>`}
+        </div>`).join("")}
+    </div>
+    ${verdict ? `<p class="cmpsum-verdict">${esc(verdict)}</p>` : ""}
+    <div class="wizard-nav" style="margin-top:0.9rem">
+      <button type="button" class="btn secondary" data-action="open-compare">${esc(t("cmpsum.details"))}</button>
+    </div>`;
+
+  container.querySelector('[data-action="open-compare"]').addEventListener("click", () => {
+    container.dispatchEvent(new CustomEvent("open:compare", { bubbles: true }));
+  });
+}
+
+function selfHostMonthlyView(hw) {
+  const price = (hw.priceEUR[0] + hw.priceEUR[1]) / 2;
+  const energy = powerKWhPerMonth(hw) * getKwh();
+  return { hardware: price / 36, energy, monthly: price / 36 + energy };
 }
 
 /* ============ cloud comparison ============ */
 
-function flagBadges(flags) {
-  return flags
-    .map((f) => `<span class="badge" title="${esc(t(`cmp.flag.${f}`))}">!</span>`)
-    .join("");
+// Readable text chips instead of "!" badges — tooltips don't work on phones.
+function flagLabels(flags) {
+  if (!flags.length) return "";
+  return `<span class="cmp-flags">${flags
+    .map((f) => `<span class="flag-label" title="${esc(t(`cmp.flag.${f}`))}">${esc(t(`cmp.flagShort.${f}`))}</span>`)
+    .join("")}</span>`;
 }
 
 export function renderComparison(container, opts) {
@@ -151,7 +213,7 @@ export function renderComparison(container, opts) {
       const label = o.kind === "selfhost" ? t("cmp.selfhost") : o.name;
       return `
         <div class="cmp-row${dim}${self}">
-          <div class="cmp-name">${esc(label)}${o.kind === "selfhost" ? "" : flagBadges(o.flags)}</div>
+          <div class="cmp-name">${esc(label)}${o.kind === "selfhost" ? "" : flagLabels(o.flags)}</div>
           <div class="cmp-bar">
             <div class="cmp-fill" style="width:${Math.max(1.5, (o[horizon] / max) * 100)}%"></div>
             <span class="cmp-val">${esc(fmtEUR(Math.round(o[horizon])))}</span>

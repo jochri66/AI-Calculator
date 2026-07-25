@@ -672,6 +672,44 @@ input[type="range"]::-moz-range-thumb {
   font-variant-numeric: tabular-nums;
 }
 
+.cmp-flags { display: inline-flex; gap: 0.3rem; margin-left: 0.45rem; vertical-align: middle; }
+.flag-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--amber);
+  background: var(--amber-bg);
+  border-radius: 5px;
+  padding: 0.1rem 0.4rem;
+  white-space: nowrap;
+}
+
+/* compact summary on the results page */
+.cmpsum-rows { display: grid; gap: 0.8rem; }
+.cmpsum-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.25rem;
+}
+.cmpsum-label { font-weight: 700; font-size: 0.95rem; }
+.cmpsum-row.self .cmpsum-label {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.cmpsum-val { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cmpsum-row.self .cmp-fill { background: var(--grad); }
+.cmpsum-name { font-size: 0.8rem; color: var(--ink-soft); display: block; margin-top: 0.2rem; }
+.cmpsum-verdict {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  background: var(--accent-soft);
+  border-radius: 12px;
+  font-size: 0.95rem;
+}
+
 .cmp-assume {
   font-size: 0.8rem;
   color: var(--ink-soft);
@@ -779,6 +817,11 @@ input[type="range"]::-moz-range-thumb {
   .compare-grid { grid-template-columns: 1fr; }
   .radio-grid { grid-template-columns: 1fr 1fr; }
   .hero { padding-top: 1.6rem; }
+  .cmp-controls { flex-direction: column; align-items: flex-start; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .stat .value { font-size: 0.98rem; }
+  .cmp-name { white-space: normal; }
+  .btn { padding: 0.65rem 1.2rem; }
 }
 
 @media (max-width: 460px) {
