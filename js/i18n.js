@@ -272,6 +272,8 @@ export const STRINGS = {
     "cta.role.coach": "Bringt KI in den Arbeitsalltag — ohne Buzzword-Bingo. Auch die Großen holen sich hier Rat.",
     "cta.follow": "Auf Instagram schreiben",
 
+    "footer.github":
+      "Open-Source-Projekt: Ein ehrlicher Planungsrechner für lokale KI im Mittelstand — Rechenweg, Hardware-Katalog und Preise sind offen einsehbar auf",
     "footer.joint": "Ein gemeinsames Projekt von",
     "footer.imprint": "Impressum",
     "footer.privacy": "Datenschutz",
@@ -548,6 +550,8 @@ export const STRINGS = {
     "cta.role.coach": "Gets AI into everyday work — zero buzzword bingo. Even the big players come here for advice.",
     "cta.follow": "DM on Instagram",
 
+    "footer.github":
+      "Open-source project: an honest planning calculator for local AI in SMEs — the math, hardware catalog and prices are open for inspection at",
     "footer.joint": "A joint project by",
     "footer.imprint": "Imprint",
     "footer.privacy": "Privacy",

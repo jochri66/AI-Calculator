@@ -143,6 +143,16 @@ a { color: var(--ink); }
 .site-footer a:hover { color: var(--ink); }
 .site-footer nav { display: flex; gap: 1rem; }
 
+.footer-git {
+  width: 100%;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+  order: -1;
+}
+.footer-git a { color: var(--ink); font-weight: 700; }
+
 /* ---------- hero & tabs ---------- */
 
 .hero { text-align: center; padding: 2.6rem 0 1.5rem; }
