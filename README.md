@@ -79,3 +79,8 @@ js/selftest.js   calibration sanity checks
 
 All figures are planning estimates, not benchmarks. Adjust the catalogs in
 `js/data.js` as prices and models evolve.
+
+## License
+
+MIT — see [LICENSE](LICENSE). Copyright (c) 2026 Winterbloom GmbH.
+The software is provided "as is", without warranty of any kind.

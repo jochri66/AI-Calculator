@@ -82,6 +82,19 @@ a { color: var(--ink); }
   z-index: 10;
 }
 
+.site-title {
+  font-weight: 800;
+  font-size: 1.02rem;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.site-title:hover { filter: brightness(1.2); }
+
 .brand-group {
   display: flex;
   align-items: center;
@@ -832,6 +845,8 @@ input[type="range"]::-moz-range-thumb {
 
 @media (max-width: 720px) {
   .panel { padding: 1.1rem; }
+  .site-title { font-size: 0.95rem; }
+  .brand-name { display: none; }
   .expert-grid { grid-template-columns: 1fr; }
   .compare-grid { grid-template-columns: 1fr; }
   .radio-grid { grid-template-columns: 1fr 1fr; }
@@ -845,5 +860,6 @@ input[type="range"]::-moz-range-thumb {
 
 @media (max-width: 460px) {
   .radio-grid { grid-template-columns: 1fr; }
-  .brand-name { display: none; }
+  .site-title { font-size: 0.88rem; }
+  .brand-x { display: none; }
 }

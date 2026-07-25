@@ -274,7 +274,7 @@ export const STRINGS = {
     "cta.follow": "Auf Instagram schreiben",
 
     "footer.github":
-      "Open-Source-Projekt: Ein ehrlicher Planungsrechner für lokale KI im Mittelstand — Rechenweg, Hardware-Katalog und Preise sind offen einsehbar auf",
+      "Open-Source-Projekt (MIT-Lizenz): Ein ehrlicher Planungsrechner für lokale KI im Mittelstand — Rechenweg, Hardware-Katalog und Preise sind offen einsehbar auf",
     "footer.joint": "Ein gemeinsames Projekt von",
     "footer.imprint": "Impressum",
     "footer.privacy": "Datenschutz",
@@ -554,7 +554,7 @@ export const STRINGS = {
     "cta.follow": "DM on Instagram",
 
     "footer.github":
-      "Open-source project: an honest planning calculator for local AI in SMEs — the math, hardware catalog and prices are open for inspection at",
+      "Open-source project (MIT license): an honest planning calculator for local AI in SMEs — the math, hardware catalog and prices are open for inspection at",
     "footer.joint": "A joint project by",
     "footer.imprint": "Imprint",
     "footer.privacy": "Privacy",
