@@ -391,62 +391,97 @@
       </div>
     </section>
 
-    <!-- ============ SHARED FOOT BLOCKS ============ -->
-    <!-- Static FAQ: plain HTML on purpose so search and AI crawlers (which
-         don't run JS) always see real content about what this tool answers. -->
+    <!-- Static bilingual FAQ: both languages live in the DOM so search and
+         AI crawlers (which don't run JS) always see real content; CSS keyed
+         on html[lang] shows the matching one. -->
     <section id="faq" class="panel faq">
-      <h2>Häufige Fragen / FAQ</h2>
-      <details>
+      <h2><span data-faq-lang="de">Häufige Fragen</span><span data-faq-lang="en">FAQ</span></h2>
+
+      <details data-faq-lang="de">
         <summary>Was kostet ein lokaler KI-Server für ein kleines Team?</summary>
         <p>Für 5–15 Leute mit Chat- und Dokumenten-Nutzung reicht oft eine Workstation mit
           einer starken GPU (RTX-4090/5090-Klasse, 24–32 GB VRAM) ab rund 3.500–7.000 €
           Komplettsystem. Ab ~30–60 Nutzern wird ein GPU-Server mit 4× RTX PRO 6000
           (ca. 66.000–77.000 €) realistisch. Dazu kommen Stromkosten von grob 50–250 €
-          im Monat, je nach System und Strompreis.
-          <em>EN: A capable single-GPU workstation from ~€3,500 covers small teams; ~30–60
-          users need a 4-GPU server around €66–77k. All figures are planning estimates.</em></p>
+          im Monat, je nach System und Strompreis.</p>
       </details>
-      <details>
+      <details data-faq-lang="en">
+        <summary>What does a local AI server cost for a small team?</summary>
+        <p>For 5–15 people using chat and document workflows, a workstation with one strong
+          GPU (RTX 4090/5090 class, 24–32 GB VRAM) from around €3,500–7,000 as a complete
+          system is often enough. From ~30–60 users a GPU server with 4× RTX PRO 6000
+          (roughly €66,000–77,000) becomes realistic. Add electricity of roughly €50–250
+          per month depending on system and power price.</p>
+      </details>
+
+      <details data-faq-lang="de">
         <summary>Lokale KI oder ChatGPT/Claude/Gemini — was ist günstiger?</summary>
         <p>Bei wenigen Nutzern ist die Cloud fast immer günstiger: Abos kosten ~21–29 €
           pro Person und Monat, API-Nutzung bei leichter Last oft noch weniger. Eigene
           Hardware rechnet sich, wenn viele Nutzer dauerhaft darauf arbeiten, Datensouveränität
           Pflicht ist (Kanzlei, Gesundheit) oder Agenten rund um die Uhr laufen. Der Rechner
           zeigt den Break-even für deinen Mix ehrlich an — oft ist ein Hybrid aus beidem am
-          sinnvollsten.
-          <em>EN: Cloud wins for small teams; self-hosting pays off with many steady users,
-          hard data-sovereignty requirements, or always-on agents.</em></p>
+          sinnvollsten.</p>
       </details>
-      <details>
+      <details data-faq-lang="en">
+        <summary>Local AI or ChatGPT/Claude/Gemini — which is cheaper?</summary>
+        <p>With few users the cloud almost always wins: subscriptions cost ~€21–29 per person
+          per month, and light API usage often even less. Your own hardware pays off when many
+          users work on it continuously, data sovereignty is mandatory (law firms, healthcare),
+          or agents run around the clock. The calculator shows the honest break-even for your
+          mix — a hybrid of both is often the best deal.</p>
+      </details>
+
+      <details data-faq-lang="de">
         <summary>Welche Hardware braucht ein 70B-Modell wie Llama 3.3?</summary>
         <p>Ein 70B-Modell braucht in 4-Bit-Quantisierung rund 40 GB Speicher plus Kontext —
           also eine GPU mit 48 GB (RTX 6000 Ada) oder besser 96 GB (RTX PRO 6000 Blackwell),
           alternativ Apple Silicon mit viel Unified Memory. Entscheidend für das Tempo ist
-          die Speicherbandbreite: Sie bestimmt, wie viele Token pro Sekunde du bekommst.
-          <em>EN: A 70B model at Q4 needs ~40 GB of memory — a 48–96 GB GPU or Apple unified
-          memory; memory bandwidth sets the tokens/second.</em></p>
+          die Speicherbandbreite: Sie bestimmt, wie viele Token pro Sekunde du bekommst.</p>
       </details>
-      <details>
+      <details data-faq-lang="en">
+        <summary>What hardware does a 70B model like Llama 3.3 need?</summary>
+        <p>A 70B model needs about 40 GB of memory in 4-bit quantization plus context — so a
+          GPU with 48 GB (RTX 6000 Ada) or better 96 GB (RTX PRO 6000 Blackwell), or Apple
+          Silicon with plenty of unified memory. Memory bandwidth decides the speed: it sets
+          how many tokens per second you get.</p>
+      </details>
+
+      <details data-faq-lang="de">
         <summary>Kann man Frontier-Modelle wie Kimi K3 (2,8 Billionen Parameter) lokal betreiben?</summary>
         <p>Ja, aber nur mit ernsthafter Hardware: ~350–600 GB Speicher in 4-Bit, sinnvoll
           ab einem 8-GPU-Server (ab ~130.000 €) bis hin zu redundanten Clustern um 400.000 €.
           Für die meisten Mittelständler liefert ein Modell der 200–700B-MoE-Klasse auf einem
           ~70.000-€-Server fast dieselbe Alltagsqualität. K3 lokal lohnt sich vor allem bei
           harter Datensouveränität plus Premium-Budget — und erst, wenn unabhängige Benchmarks
-          da sind.
-          <em>EN: Possible from ~€130k (8-GPU node) upward; for most SMEs a mid-size MoE on a
-          ~€70k server does the job. Wait for independent benchmarks.</em></p>
+          da sind.</p>
       </details>
-      <details>
+      <details data-faq-lang="en">
+        <summary>Can you run frontier models like Kimi K3 (2.8 trillion parameters) locally?</summary>
+        <p>Yes, but only with serious hardware: ~350–600 GB of memory at 4-bit, sensible from
+          an 8-GPU server (from ~€130,000) up to redundant clusters around €400,000. For most
+          SMEs a 200–700B MoE-class model on a ~€70,000 server delivers almost the same everyday
+          quality. K3 on-premises mainly makes sense with hard data sovereignty plus a premium
+          budget — and only once independent benchmarks exist.</p>
+      </details>
+
+      <details data-faq-lang="de">
         <summary>Wovon hängt die Leistung eines KI-Servers ab? (Die vier Flaschenhälse)</summary>
         <p>1. <strong>Speicherkapazität</strong>: Passt das Modell überhaupt hinein?
           2. <strong>Speicherbandbreite</strong>: Bestimmt die Token pro Sekunde pro Sitzung.
           3. <strong>Rechenleistung</strong>: Bestimmt, wie viele parallele Sitzungen per
           Batching möglich sind. 4. <strong>Interconnect</strong>: Verbindet mehrere GPUs oder
           Rechner — langsame Verbindungen (PCIe, Thunderbolt) bremsen große MoE-Modelle stark.
-          Dieser Rechner modelliert alle vier ehrlich.
-          <em>EN: Memory capacity, memory bandwidth, compute (batching), and interconnect —
-          this calculator models all four.</em></p>
+          Dieser Rechner modelliert alle vier ehrlich.</p>
+      </details>
+      <details data-faq-lang="en">
+        <summary>What determines an AI server's performance? (The four bottlenecks)</summary>
+        <p>1. <strong>Memory capacity</strong>: does the model fit at all?
+          2. <strong>Memory bandwidth</strong>: sets the tokens per second per session.
+          3. <strong>Compute</strong>: sets how many parallel sessions batching allows.
+          4. <strong>Interconnect</strong>: links multiple GPUs or machines — slow links
+          (PCIe, Thunderbolt) heavily throttle large MoE models. This calculator models all
+          four honestly.</p>
       </details>
     </section>
 

@@ -481,7 +481,11 @@ input[type="range"]::-moz-range-thumb {
 .caveats h4 { color: var(--amber); font-size: 0.95rem; margin-bottom: 0.5rem; }
 .caveats ul { padding-left: 1.1rem; display: grid; gap: 0.45rem; font-size: 0.92rem; }
 
-/* static FAQ (plain HTML so crawlers see it) */
+/* static FAQ (plain HTML so crawlers see it) — both languages live in the
+   DOM; CSS keyed on html[lang] shows the matching one */
+.faq [data-faq-lang="en"] { display: none; }
+html[lang="en"] .faq [data-faq-lang="en"] { display: revert; }
+html[lang="en"] .faq [data-faq-lang="de"] { display: none; }
 .faq h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: 0.8rem; }
 .faq details {
   border: 1px solid var(--line);
