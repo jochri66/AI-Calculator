@@ -199,6 +199,22 @@ export function run() {
   check("H200 node faster than 8x PRO 6000 (NVLink, no PCIe penalty)",
     h200TokS > proNodeTokS, `${h200TokS.toFixed(1)} vs ${proNodeTokS.toFixed(1)}`);
 
+  // --- AMD MI350P (144 GB HBM3E PCIe, 05/2026) ---
+  const mi1 = hw("server-1x-mi350p");
+  const mi4 = hw("server-4x-mi350p");
+  check("MI350P 1x margined price = 33000", mi1.priceEUR[0] === 33000, String(mi1.priceEUR[0]));
+  check("MI350P 4x margined price = 132000", mi4.priceEUR[0] === 132000, String(mi4.priceEUR[0]));
+  const llama70 = model("llama33-70b");
+  const mi1cap = capacity(llama70, "q8", 8192, mi1, 1);
+  check("1x MI350P fits Llama 70B Q8", mi1cap.fits, `footprint ${mi1cap.footprint.toFixed(0)} GB`);
+  check("1x MI350P outruns 1x PRO 6000 per stream",
+    singleStreamTokS(llama70, "q4", mi1) > singleStreamTokS(llama70, "q4", hw("rtxpro6000")),
+    `${singleStreamTokS(llama70, "q4", mi1).toFixed(0)} vs ${singleStreamTokS(llama70, "q4", hw("rtxpro6000")).toFixed(0)}`);
+  // 576 GB * 0.92 usable = ~530 GB — honestly NOT enough for K3 Q4 (560 GB
+  // weights), but plenty for DeepSeek-V3.x Q4 (~376 GB).
+  check("4x MI350P does NOT fit K3 Q4", !capacity(k3, "q4", 8192, mi4, 1).fits);
+  check("4x MI350P fits DeepSeek-V3 Q4", capacity(model("deepseek-v3"), "q4", 8192, mi4, 1).fits);
+
   // --- Budget miss must not duplicate the primary as "premium" ---
   const recMiss = recommend({
     users: 60, mix: { chat: 40, rag: 30, coding: 20, agentic: 10 },

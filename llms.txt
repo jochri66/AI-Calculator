@@ -26,8 +26,9 @@ Source: https://github.com/jochri66/AI-Calculator
 3. Cloud comparison uses per-use-case token profiles (chat/RAG/coding/agentic) at
    21 workdays/month against researched EUR list prices (07/2026).
 4. Catalog spans used EPYC CPU servers (~€2.8k) through RTX 4090/5090/PRO 6000
-   workstations, 4×/8× GPU servers, Apple silicon, AMD MI325X, 8× NVIDIA H200 SXM
-   enterprise nodes (~€363–418k), and redundant 3-node clusters (~€418–462k).
+   workstations, 4×/8× GPU servers, Apple silicon, AMD Instinct MI350P (144 GB
+   HBM3E PCIe) and MI325X, 8× NVIDIA H200 SXM enterprise nodes (~€363–418k), and
+   redundant 3-node clusters (~€418–462k).
 5. Models covered: Llama 3.1/3.3, Qwen3, Mistral Small, DeepSeek-V3.x, Qwen3-235B,
    Kimi K3 2.8T MoE (~350–600 GB at Q4).
 

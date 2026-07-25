@@ -151,6 +151,24 @@ export const HARDWARE = [
     priceCheck: "RTX PRO 6000 Blackwell", instances: 1, redundant: false, noteKeys: [],
   },
   {
+    // AMD's PCIe Instinct card (05/2026): CDNA4, 144 GB HBM3E, 4 TB/s,
+    // 600 W, dual-slot air-cooled — drop-in for standard PCIe Gen5 servers.
+    id: "server-1x-mi350p", category: "gpu-node", name: "Server, 1x AMD MI350P (144 GB HBM3e)",
+    priceEUR: [30000, 40000], memGB: 144, memType: "vram",
+    bandwidthGBs: 4000, bandwidthEfficiency: 0.65,
+    maxBatchBoost: 12, maxStreams: 12, interconnect: "none",
+    priceCheck: "AMD Instinct MI350P", instances: 1, redundant: false,
+    noteKeys: ["hw.note.rocm"],
+  },
+  {
+    id: "server-4x-mi350p", category: "gpu-node", name: "GPU server, 4x AMD MI350P (576 GB HBM3e)",
+    priceEUR: [120000, 155000], memGB: 576, memType: "vram",
+    bandwidthGBs: 4500, bandwidthEfficiency: 0.65,
+    maxBatchBoost: 12, maxStreams: 16, interconnect: "pcie",
+    priceCheck: "AMD Instinct MI350P", instances: 1, redundant: false,
+    noteKeys: ["hw.note.rocm"],
+  },
+  {
     id: "mac-m3ultra", category: "apple", name: "Mac Studio M3 Ultra (512 GB unified)",
     priceEUR: [11000, 13000], memGB: 512, memType: "unified",
     bandwidthGBs: 819, bandwidthEfficiency: 0.6,
@@ -214,7 +232,7 @@ export const HARDWARE = [
     priceEUR: [110000, 160000], memGB: 2048, memType: "vram",
     bandwidthGBs: 3000, bandwidthEfficiency: 0.65,
     maxBatchBoost: 16, maxStreams: 24, interconnect: "fabric",
-    priceCheck: "AMD Instinct MI325X", instances: 1, redundant: false, noteKeys: ["hw.note.production"],
+    priceCheck: "AMD Instinct MI325X", instances: 1, redundant: false, noteKeys: ["hw.note.production", "hw.note.rocm"],
   },
 ];
 
@@ -273,6 +291,7 @@ const POWER_W = {
   "rtx4090": 600, "rtx5090": 750, "rtx6000-ada": 500, "rtxpro6000": 700,
   "dual-rtxpro6000": 1100, "mac-m3ultra": 250, "mac-cluster": 1000,
   "epyc-milan-1tb": 500, "epyc-turin-dual": 800, "server-4x-pro6000": 2500,
+  "server-1x-mi350p": 750, "server-4x-mi350p": 2900,
   "node-8x-pro6000": 4500, "node-8x-h200": 7500,
   "cluster-3node": 10000, "cluster-8x-mi325x": 8000,
 };

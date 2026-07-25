@@ -141,6 +141,7 @@ export const STRINGS = {
     "hw.note.redundant": "Redundante Auslegung: 2 aktive Knoten + 1 Reserve, ausfallsicher.",
     "hw.note.production": "Produktionsreife Rechenzentrums-Lösung (Strom, Kühlung, Wartung einplanen).",
     "hw.note.enterprise": "Enterprise-Klasse (OEM wie Dell/Supermicro): Preis pro Knoten inkl. Deployment und 36 Monate Support — Netzwerk, Switches und Racks kommen bei Multi-Node-Setups dazu.",
+    "hw.note.rocm": "AMD ROCm statt CUDA: Läuft gut mit vLLM und den gängigen offenen Modellen, aber viele KI-Tools sind CUDA-first — prüf vorher, ob dein Software-Stack ROCm unterstützt.",
 
     "expert.title": "Experten-Modus",
     "expert.desc":
@@ -429,6 +430,7 @@ export const STRINGS = {
     "hw.note.redundant": "Redundant design: 2 active nodes + 1 spare, fault-tolerant.",
     "hw.note.production": "Production-grade datacenter solution (plan for power, cooling, maintenance).",
     "hw.note.enterprise": "Enterprise class (OEM like Dell/Supermicro): per-node price includes deployment and 36 months of support — networking, switches and racks are extra in multi-node setups.",
+    "hw.note.rocm": "AMD ROCm instead of CUDA: works well with vLLM and the common open models, but many AI tools are CUDA-first — check that your software stack supports ROCm before buying.",
 
     "expert.title": "Expert mode",
     "expert.desc":
