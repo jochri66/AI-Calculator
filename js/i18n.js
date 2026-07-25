@@ -278,6 +278,7 @@ export const STRINGS = {
     "footer.joint": "Ein gemeinsames Projekt von",
     "footer.imprint": "Impressum",
     "footer.privacy": "Datenschutz",
+    "footer.disclaimerLink": "Haftungsausschluss",
     "unit.gb": "GB",
   },
 
@@ -557,6 +558,7 @@ export const STRINGS = {
     "footer.joint": "A joint project by",
     "footer.imprint": "Imprint",
     "footer.privacy": "Privacy",
+    "footer.disclaimerLink": "Disclaimer",
     "unit.gb": "GB",
   },
 };
