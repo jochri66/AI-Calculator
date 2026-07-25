@@ -1,0 +1,42 @@
+# AI Server Calculator
+
+> Free, open-source (MIT) planning calculator that tells small and mid-size businesses
+> what hardware they actually need to run AI models locally — with honest numbers
+> instead of marketing promises. German/English. By Winterbloom GmbH (Düsseldorf)
+> with @jochri66 (hardware engineer) and @ai.career.coach (AI consultant).
+
+Live: https://jochri66.github.io/AI-Calculator/
+Source: https://github.com/jochri66/AI-Calculator
+
+## What it answers
+
+- Which server/GPU a team of N users needs for chat, RAG, coding, or agentic AI workloads
+- Honest cost comparison: own hardware vs ChatGPT/Claude/Gemini subscriptions and APIs
+- Monthly power cost by country, redundancy options (cold spare vs hot spare), financing
+  (upfront vs 1/3-year), and hybrid local+cloud splits driven by a data-sovereignty slider
+
+## Methodology (all in the open-source code)
+
+1. Four bottlenecks modeled: memory capacity (does the model fit), memory bandwidth
+   (tokens/second per session), compute (parallel sessions via batching), and
+   interconnect (multi-GPU/multi-node penalties, especially for MoE models over PCIe).
+2. Hardware prices are COMPLETE systems (CPU, ECC RAM, NVMe, PSU, assembly, warranty,
+   support — not bare GPUs), street prices as of 07/2026 incl. a 10% service margin.
+   GPU prices are heavily inflated by the 2025/26 memory shortage.
+3. Cloud comparison uses per-use-case token profiles (chat/RAG/coding/agentic) at
+   21 workdays/month against researched EUR list prices (07/2026).
+4. Catalog spans used EPYC CPU servers (~€2.8k) through RTX 4090/5090/PRO 6000
+   workstations, 4×/8× GPU servers, Apple silicon, AMD MI325X, 8× NVIDIA H200 SXM
+   enterprise nodes (~€363–418k), and redundant 3-node clusters (~€418–462k).
+5. Models covered: Llama 3.1/3.3, Qwen3, Mistral Small, DeepSeek-V3.x, Qwen3-235B,
+   Kimi K3 2.8T MoE (~350–600 GB at Q4).
+
+## Important
+
+All figures are non-binding planning estimates, not benchmarks or offers — real-world
+performance varies ±30% or more with software stack and configuration. Purchase
+decisions require real quotes and benchmarks. Legal notice, privacy policy, and full
+disclaimer: https://jochri66.github.io/AI-Calculator/legal.html
+
+License: MIT (https://github.com/jochri66/AI-Calculator/blob/gh-pages/LICENSE)
+Contact: https://www.instagram.com/jochri66 · https://www.instagram.com/ai.career.coach

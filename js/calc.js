@@ -257,6 +257,13 @@ export function recommend(answers) {
     alternative = cheapest;
   }
 
+  // Honest miss: nothing in budget -> show cheapest viable anyway, clearly
+  // marked. Must run BEFORE the premium pick so the premium tier reference
+  // and dedupe compare against the actual primary (else the same pair shows
+  // twice as "recommendation" and "premium").
+  const budgetMiss = !primary && all.length > 0;
+  if (budgetMiss) primary = all[0];
+
   // Premium: cheapest viable pair at a tier above the primary's (frontier lands here).
   let premium = null;
   const refTier = primary ? TIER_RANK[primary.model.tier] : -1;
@@ -268,10 +275,6 @@ export function recommend(answers) {
       premium = null;
     }
   }
-
-  // Honest miss: nothing in budget -> show cheapest viable anyway, clearly marked.
-  const budgetMiss = !primary && all.length > 0;
-  if (budgetMiss) primary = all[0];
 
   // Nothing viable at all (e.g. impossible stream count): show the option that
   // serves the most users, flagged as a capacity shortfall.

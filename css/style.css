@@ -481,6 +481,36 @@ input[type="range"]::-moz-range-thumb {
 .caveats h4 { color: var(--amber); font-size: 0.95rem; margin-bottom: 0.5rem; }
 .caveats ul { padding-left: 1.1rem; display: grid; gap: 0.45rem; font-size: 0.92rem; }
 
+/* static FAQ (plain HTML so crawlers see it) */
+.faq h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: 0.8rem; }
+.faq details {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  margin-bottom: 0.6rem;
+  overflow: hidden;
+}
+.faq summary {
+  cursor: pointer;
+  padding: 0.85rem 1rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  list-style: none;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::before { content: "+ "; font-weight: 800; }
+.faq details[open] summary::before { content: "− "; }
+.faq summary:hover {
+  background: linear-gradient(90deg, rgba(221, 42, 123, 0.08), rgba(81, 91, 212, 0.08));
+}
+.faq details p {
+  padding: 0 1rem 0.9rem;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+.faq details em { display: block; margin-top: 0.4rem; opacity: 0.75; font-size: 0.84rem; }
+
 /* price transparency: complete-system note + verify-yourself links */
 .price-note {
   margin-top: 1rem;

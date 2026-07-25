@@ -3,7 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Server Calculator</title>
+  <title>AI Server Calculator — Wie viel Server braucht deine lokale KI?</title>
+  <meta name="description" content="Kostenloser Rechner für den Mittelstand: Welche Hardware braucht lokale KI wirklich? Server-Empfehlung, Stromkosten und ehrlicher Kostenvergleich mit ChatGPT, Claude & Gemini. Open Source (MIT).">
+  <link rel="canonical" href="https://jochri66.github.io/AI-Calculator/">
+  <meta property="og:title" content="AI Server Calculator — Wie viel Server braucht deine lokale KI?">
+  <meta property="og:description" content="Ehrliche Zahlen statt Marketing-Versprechen: Hardware-Empfehlung, Stromkosten und Cloud-Vergleich für lokale KI im Mittelstand. Kostenlos & Open Source.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jochri66.github.io/AI-Calculator/">
+  <meta property="og:locale" content="de_DE">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "AI Server Calculator",
+        "url": "https://jochri66.github.io/AI-Calculator/",
+        "description": "Kostenloser Open-Source-Rechner für den Mittelstand: Welche Hardware braucht lokale KI wirklich? Server-Empfehlung, Stromkosten, Redundanz und ehrlicher Kostenvergleich mit ChatGPT, Claude und Gemini.",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "inLanguage": ["de", "en"],
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+        "license": "https://github.com/jochri66/AI-Calculator/blob/gh-pages/LICENSE",
+        "creator": { "@type": "Organization", "name": "Winterbloom GmbH" },
+        "codeRepository": "https://github.com/jochri66/AI-Calculator"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Was kostet ein lokaler KI-Server für ein kleines Team?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Für 5–15 Leute reicht oft eine Workstation mit einer starken GPU (24–32 GB VRAM) ab rund 3.500–7.000 € Komplettsystem. Ab ~30–60 Nutzern wird ein GPU-Server mit 4× RTX PRO 6000 (ca. 66.000–77.000 €) realistisch, plus ~50–250 € Strom pro Monat. Alle Angaben sind unverbindliche Planungsschätzungen." }
+          },
+          {
+            "@type": "Question",
+            "name": "Lokale KI oder ChatGPT/Claude/Gemini — was ist günstiger?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Bei wenigen Nutzern ist die Cloud fast immer günstiger (~21–29 € pro Person/Monat). Eigene Hardware rechnet sich bei vielen dauerhaften Nutzern, harter Datensouveränität oder rund um die Uhr laufenden Agenten. Oft ist ein Hybrid am sinnvollsten." }
+          },
+          {
+            "@type": "Question",
+            "name": "Welche Hardware braucht ein 70B-Modell wie Llama 3.3?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Rund 40 GB Speicher in 4-Bit-Quantisierung plus Kontext — also eine GPU mit 48–96 GB VRAM oder Apple Silicon mit viel Unified Memory. Die Speicherbandbreite bestimmt die Token pro Sekunde." }
+          },
+          {
+            "@type": "Question",
+            "name": "Kann man Frontier-Modelle wie Kimi K3 lokal betreiben?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Ja, ab ~350–600 GB Speicher in 4-Bit: sinnvoll ab einem 8-GPU-Server (~130.000 €) bis zu redundanten Clustern um 400.000 €. Für die meisten Mittelständler liefert ein mittelgroßes MoE-Modell auf einem ~70.000-€-Server fast dieselbe Alltagsqualität." }
+          },
+          {
+            "@type": "Question",
+            "name": "Wovon hängt die Leistung eines KI-Servers ab?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Von vier Flaschenhälsen: Speicherkapazität (passt das Modell?), Speicherbandbreite (Token pro Sekunde), Rechenleistung (parallele Sitzungen per Batching) und Interconnect (Verbindung mehrerer GPUs/Rechner)." }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='3' y='3' width='10' height='10' rx='2' transform='rotate(45 8 8)' fill='%230e6e5c'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -26,8 +84,8 @@
 
   <main>
     <section class="hero">
-      <h1 data-i18n="app.title"></h1>
-      <p class="tagline" data-i18n="app.tagline"></p>
+      <h1 data-i18n="app.title">Wie viel Server braucht deine lokale KI?</h1>
+      <p class="tagline" data-i18n="app.tagline">Finde raus, welche Hardware du wirklich brauchst, um KI-Modelle bei dir laufen zu lassen — ehrliche Zahlen statt Marketing-Versprechen.</p>
     </section>
 
     <nav class="mode-tabs" role="tablist">
@@ -334,6 +392,64 @@
     </section>
 
     <!-- ============ SHARED FOOT BLOCKS ============ -->
+    <!-- Static FAQ: plain HTML on purpose so search and AI crawlers (which
+         don't run JS) always see real content about what this tool answers. -->
+    <section id="faq" class="panel faq">
+      <h2>Häufige Fragen / FAQ</h2>
+      <details>
+        <summary>Was kostet ein lokaler KI-Server für ein kleines Team?</summary>
+        <p>Für 5–15 Leute mit Chat- und Dokumenten-Nutzung reicht oft eine Workstation mit
+          einer starken GPU (RTX-4090/5090-Klasse, 24–32 GB VRAM) ab rund 3.500–7.000 €
+          Komplettsystem. Ab ~30–60 Nutzern wird ein GPU-Server mit 4× RTX PRO 6000
+          (ca. 66.000–77.000 €) realistisch. Dazu kommen Stromkosten von grob 50–250 €
+          im Monat, je nach System und Strompreis.
+          <em>EN: A capable single-GPU workstation from ~€3,500 covers small teams; ~30–60
+          users need a 4-GPU server around €66–77k. All figures are planning estimates.</em></p>
+      </details>
+      <details>
+        <summary>Lokale KI oder ChatGPT/Claude/Gemini — was ist günstiger?</summary>
+        <p>Bei wenigen Nutzern ist die Cloud fast immer günstiger: Abos kosten ~21–29 €
+          pro Person und Monat, API-Nutzung bei leichter Last oft noch weniger. Eigene
+          Hardware rechnet sich, wenn viele Nutzer dauerhaft darauf arbeiten, Datensouveränität
+          Pflicht ist (Kanzlei, Gesundheit) oder Agenten rund um die Uhr laufen. Der Rechner
+          zeigt den Break-even für deinen Mix ehrlich an — oft ist ein Hybrid aus beidem am
+          sinnvollsten.
+          <em>EN: Cloud wins for small teams; self-hosting pays off with many steady users,
+          hard data-sovereignty requirements, or always-on agents.</em></p>
+      </details>
+      <details>
+        <summary>Welche Hardware braucht ein 70B-Modell wie Llama 3.3?</summary>
+        <p>Ein 70B-Modell braucht in 4-Bit-Quantisierung rund 40 GB Speicher plus Kontext —
+          also eine GPU mit 48 GB (RTX 6000 Ada) oder besser 96 GB (RTX PRO 6000 Blackwell),
+          alternativ Apple Silicon mit viel Unified Memory. Entscheidend für das Tempo ist
+          die Speicherbandbreite: Sie bestimmt, wie viele Token pro Sekunde du bekommst.
+          <em>EN: A 70B model at Q4 needs ~40 GB of memory — a 48–96 GB GPU or Apple unified
+          memory; memory bandwidth sets the tokens/second.</em></p>
+      </details>
+      <details>
+        <summary>Kann man Frontier-Modelle wie Kimi K3 (2,8 Billionen Parameter) lokal betreiben?</summary>
+        <p>Ja, aber nur mit ernsthafter Hardware: ~350–600 GB Speicher in 4-Bit, sinnvoll
+          ab einem 8-GPU-Server (ab ~130.000 €) bis hin zu redundanten Clustern um 400.000 €.
+          Für die meisten Mittelständler liefert ein Modell der 200–700B-MoE-Klasse auf einem
+          ~70.000-€-Server fast dieselbe Alltagsqualität. K3 lokal lohnt sich vor allem bei
+          harter Datensouveränität plus Premium-Budget — und erst, wenn unabhängige Benchmarks
+          da sind.
+          <em>EN: Possible from ~€130k (8-GPU node) upward; for most SMEs a mid-size MoE on a
+          ~€70k server does the job. Wait for independent benchmarks.</em></p>
+      </details>
+      <details>
+        <summary>Wovon hängt die Leistung eines KI-Servers ab? (Die vier Flaschenhälse)</summary>
+        <p>1. <strong>Speicherkapazität</strong>: Passt das Modell überhaupt hinein?
+          2. <strong>Speicherbandbreite</strong>: Bestimmt die Token pro Sekunde pro Sitzung.
+          3. <strong>Rechenleistung</strong>: Bestimmt, wie viele parallele Sitzungen per
+          Batching möglich sind. 4. <strong>Interconnect</strong>: Verbindet mehrere GPUs oder
+          Rechner — langsame Verbindungen (PCIe, Thunderbolt) bremsen große MoE-Modelle stark.
+          Dieser Rechner modelliert alle vier ehrlich.
+          <em>EN: Memory capacity, memory bandwidth, compute (batching), and interconnect —
+          this calculator models all four.</em></p>
+      </details>
+    </section>
+
     <section class="panel disclaimer-block">
       <p class="disclaimer" data-i18n="app.disclaimer"></p>
     </section>

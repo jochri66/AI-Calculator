@@ -1,5 +1,7 @@
 # AI Server Calculator
 
+**Live: <https://jochri66.github.io/AI-Calculator/>**
+
 A bilingual (DE/EN) calculator that helps small and mid-sized companies figure
 out what hardware they need to run large language models on-premises — with
 honest, physics-based estimates instead of marketing promises.

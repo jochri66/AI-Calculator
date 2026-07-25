@@ -199,6 +199,18 @@ export function run() {
   check("H200 node faster than 8x PRO 6000 (NVLink, no PCIe penalty)",
     h200TokS > proNodeTokS, `${h200TokS.toFixed(1)} vs ${proNodeTokS.toFixed(1)}`);
 
+  // --- Budget miss must not duplicate the primary as "premium" ---
+  const recMiss = recommend({
+    users: 60, mix: { chat: 40, rag: 30, coding: 20, agentic: 10 },
+    sovereignty: "hard", budgetId: "b2", quality: "good",
+  });
+  check("Budget miss: flagged", recMiss.budgetMiss === true);
+  check("Budget miss: premium is not a duplicate of primary",
+    !recMiss.premium ||
+      recMiss.premium.hw.id !== recMiss.primary.hw.id ||
+      recMiss.premium.model.id !== recMiss.primary.model.id,
+    recMiss.premium ? `${recMiss.premium.model.id}+${recMiss.premium.hw.id}` : "null");
+
   // --- H200 as a winnable recommendation ---
   // 250 pure-chat users need 32 streams: the H200 node covers that and is
   // cheaper than the 3-node cluster, so it wins as a regular primary.
