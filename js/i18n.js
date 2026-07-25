@@ -179,24 +179,26 @@ export const STRINGS = {
     "red.none": "Kann mal ausfallen",
     "red.none.desc": "Ein System reicht — ein Tag Ausfall wäre ärgerlich, aber kein Drama",
     "red.standby": "Sollte schnell wieder laufen",
-    "red.standby.desc": "Zweites System als Standby — bei Ausfall manuell umschalten (Minuten bis Stunden)",
+    "red.standby.desc": "Cold-Spare: zweites System im Regal, ausgeschaltet — bei Ausfall manuell umschalten (Minuten bis Stunden)",
     "red.full": "Muss immer laufen",
-    "red.full.desc": "Automatischer Failover — Ausfall eines Systems merkt niemand",
+    "red.full.desc": "Hot-Spare: zweites System läuft mit — automatischer Failover, Ausfall merkt niemand",
     "red.explain.title": "Warum das wichtig ist:",
     "red.explain":
-      "Ohne Redundanz ist dein KI-Server ein Single Point of Failure — fällt er aus, steht die KI für das ganze Team, bis Ersatz läuft. Redundanz kostet grob das Doppelte an Hardware, dafür arbeitet dein Team weiter, wenn ein System stirbt. Backups ersetzen keine Redundanz: Sie retten deine Daten, nicht deine Verfügbarkeit.",
+      "Ohne Redundanz ist dein KI-Server ein Single Point of Failure — fällt er aus, steht die KI für das ganze Team, bis Ersatz läuft. Redundanz kostet grob das Doppelte an Hardware, dafür arbeitet dein Team weiter, wenn ein System stirbt. Der Unterschied: Ein Cold-Spare steht ausgeschaltet bereit und kostet praktisch keinen Strom, ein Hot-Spare läuft ständig mit — doppelte Stromkosten, dafür Umschalten in Sekunden. Backups ersetzen keine Redundanz: Sie retten deine Daten, nicht deine Verfügbarkeit.",
 
     "redcard.badge": "Ausfallsicherheit",
-    "redcard.headline.standby": "Zweites System als Standby",
-    "redcard.headline.full": "Zwei Systeme mit automatischem Failover",
+    "redcard.headline.standby": "Cold-Spare: zweites System als Standby",
+    "redcard.headline.full": "Hot-Spare: zwei Systeme mit automatischem Failover",
     "redcard.builtin":
       "Schon eingebaut: Diese Konfiguration ist redundant ausgelegt (aktive Knoten + Reserve).",
     "redcard.extra": "Mehrkosten",
     "redcard.total": "Gesamt (2 Systeme)",
+    "redcard.power": "Strom zusätzlich/Monat",
+    "redcard.power.none": "praktisch keiner (Spare ist aus)",
     "redcard.note.standby":
-      "Beim Ausfall schaltest du (oder wir) manuell um — rechne mit Minuten bis Stunden Unterbrechung. Der Standby kann bis dahin als Test- oder Entwicklungssystem arbeiten.",
+      "Der Cold-Spare steht ausgeschaltet bereit und verbraucht praktisch keinen Strom. Beim Ausfall schaltest du (oder wir) manuell um — rechne mit Minuten bis Stunden Unterbrechung. Bis dahin kann er als Test- oder Entwicklungssystem arbeiten.",
     "redcard.note.full":
-      "Load Balancer verteilt auf beide Systeme; fällt eins aus, übernimmt das andere automatisch — dein Team merkt nichts. Etwas Einrichtungsaufwand kommt dazu.",
+      "Der Hot-Spare läuft ständig mit — deshalb verdoppeln sich die Stromkosten. Load Balancer verteilt auf beide Systeme; fällt eins aus, übernimmt das andere in Sekunden — dein Team merkt nichts. Etwas Einrichtungsaufwand (Failover-Setup) kommt dazu.",
     "caveat.noRedundancy":
       "Ein einzelnes System ist ein Single Point of Failure. Ab ~25 Nutzern lohnt sich ein Standby-System — sonst steht bei einem Defekt das ganze Team.",
 
@@ -272,6 +274,10 @@ export const STRINGS = {
     "cta.role.hardware": "Ingenieur, kein Verkäufer — plant, baut und betreibt die Systeme, auf denen deine KI läuft. Vom ersten Server bis zum redundanten Cluster, ehrlich gerechnet statt überdimensioniert verkauft.",
     "cta.role.coach": "Bringt KI in den Arbeitsalltag — ohne Buzzword-Bingo. Auch die Großen holen sich hier Rat.",
     "cta.follow": "Auf Instagram schreiben",
+
+    "results.priceNote":
+      "Alle Preise sind Komplettsysteme — CPU, RAM, NVMe-Speicher, Netzteil, Zusammenbau, Test, Garantie & Support inklusive, nicht nur die GPUs. Straßenpreise Stand {asof}: GPU-Preise sind wegen der Speicherknappheit stark gestiegen. Prüf die Preise gern selbst:",
+    "results.priceCheck": "Aktuelle Preise für {part} prüfen",
 
     "footer.github":
       "Open-Source-Projekt (MIT-Lizenz): Ein ehrlicher Planungsrechner für lokale KI im Mittelstand — Rechenweg, Hardware-Katalog und Preise sind offen einsehbar auf",
@@ -459,24 +465,26 @@ export const STRINGS = {
     "red.none": "Can go down occasionally",
     "red.none.desc": "One system is enough — a day of downtime would be annoying, not a disaster",
     "red.standby": "Should recover quickly",
-    "red.standby.desc": "Second system on standby — manual switchover on failure (minutes to hours)",
+    "red.standby.desc": "Cold spare: second system on the shelf, powered off — manual switchover on failure (minutes to hours)",
     "red.full": "Must always run",
-    "red.full.desc": "Automatic failover — nobody notices when one system dies",
+    "red.full.desc": "Hot spare: second system runs alongside — automatic failover, nobody notices an outage",
     "red.explain.title": "Why this matters:",
     "red.explain":
-      "Without redundancy your AI server is a single point of failure — if it dies, AI is down for the whole team until a replacement runs. Redundancy roughly doubles the hardware cost, but your team keeps working when one system dies. Backups are not redundancy: they save your data, not your uptime.",
+      "Without redundancy your AI server is a single point of failure — if it dies, AI is down for the whole team until a replacement runs. Redundancy roughly doubles the hardware cost, but your team keeps working when one system dies. The difference: a cold spare sits powered off and costs practically no electricity, a hot spare runs continuously — double the power bill, but switchover in seconds. Backups are not redundancy: they save your data, not your uptime.",
 
     "redcard.badge": "Fault tolerance",
-    "redcard.headline.standby": "Second system on standby",
-    "redcard.headline.full": "Two systems with automatic failover",
+    "redcard.headline.standby": "Cold spare: second system on standby",
+    "redcard.headline.full": "Hot spare: two systems with automatic failover",
     "redcard.builtin":
       "Already built in: this configuration is designed redundantly (active nodes + spare).",
     "redcard.extra": "Extra cost",
     "redcard.total": "Total (2 systems)",
+    "redcard.power": "Extra power/month",
+    "redcard.power.none": "practically none (spare is off)",
     "redcard.note.standby":
-      "On failure you (or we) switch over manually — expect minutes to hours of interruption. Until then the standby can double as a test or development system.",
+      "The cold spare sits powered off and uses practically no electricity. On failure you (or we) switch over manually — expect minutes to hours of interruption. Until then it can double as a test or development system.",
     "redcard.note.full":
-      "A load balancer spreads work across both systems; if one fails the other takes over automatically — your team notices nothing. Adds some setup effort.",
+      "The hot spare runs continuously — that's why power costs double. A load balancer spreads work across both systems; if one fails the other takes over in seconds — your team notices nothing. Adds some setup effort (failover configuration).",
     "caveat.noRedundancy":
       "A single system is a single point of failure. From ~25 users a standby system pays off — otherwise one defect stops the whole team.",
 
@@ -552,6 +560,10 @@ export const STRINGS = {
     "cta.role.hardware": "Engineer, not a salesman — designs, builds and runs the systems your AI lives on. From first server to redundant cluster, honestly calculated instead of oversold.",
     "cta.role.coach": "Gets AI into everyday work — zero buzzword bingo. Even the big players come here for advice.",
     "cta.follow": "DM on Instagram",
+
+    "results.priceNote":
+      "All prices are complete systems — CPU, RAM, NVMe storage, PSU, assembly, testing, warranty & support included, not just the GPUs. Street prices as of {asof}: GPU prices are heavily inflated by the memory shortage. Feel free to verify yourself:",
+    "results.priceCheck": "Check current prices for {part}",
 
     "footer.github":
       "Open-source project (MIT license): an honest planning calculator for local AI in SMEs — the math, hardware catalog and prices are open for inspection at",

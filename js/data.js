@@ -1,6 +1,9 @@
 // Model & hardware catalog + planning constants.
 // All numbers are practical estimates for planning purposes, not benchmarks.
-// Prices are street-price ranges in EUR (net) as of mid-2026.
+// Prices are street-price ranges in EUR (net) as of 07/2026 for COMPLETE systems:
+// GPUs + CPU, ECC RAM, NVMe storage, PSU/chassis, assembly & testing.
+// GPU street prices are heavily inflated by the 2025/26 memory shortage
+// (e.g. RTX PRO 6000: $8,565 launch -> $13,250 list in 16 months).
 
 export const QUANTS = {
   q4:   { bytesPerParam: 0.56, labelKey: "quant.q4" },   // ~4.5 bits/weight (GGUF/AWQ class)
@@ -114,94 +117,94 @@ export const MODELS = [
 export const HARDWARE = [
   {
     id: "rtx4090", category: "consumer-gpu", name: "Workstation, 1x RTX 4090 (24 GB)",
-    priceEUR: [2200, 3000], memGB: 24, memType: "vram",
+    priceEUR: [3200, 4200], memGB: 24, memType: "vram",
     bandwidthGBs: 1008, bandwidthEfficiency: 0.65,
     maxBatchBoost: 8, maxStreams: 8, interconnect: "none",
-    instances: 1, redundant: false, noteKeys: [],
+    priceCheck: "RTX 4090", instances: 1, redundant: false, noteKeys: [],
   },
   {
     id: "rtx5090", category: "consumer-gpu", name: "Workstation, 1x RTX 5090 (32 GB)",
-    priceEUR: [3000, 4200], memGB: 32, memType: "vram",
+    priceEUR: [5000, 6500], memGB: 32, memType: "vram",
     bandwidthGBs: 1792, bandwidthEfficiency: 0.65,
     maxBatchBoost: 8, maxStreams: 8, interconnect: "none",
-    instances: 1, redundant: false, noteKeys: [],
+    priceCheck: "RTX 5090", instances: 1, redundant: false, noteKeys: [],
   },
   {
     id: "rtx6000-ada", category: "workstation-gpu", name: "Workstation, 1x RTX 6000 Ada (48 GB)",
-    priceEUR: [7000, 9000], memGB: 48, memType: "vram",
+    priceEUR: [8000, 10000], memGB: 48, memType: "vram",
     bandwidthGBs: 960, bandwidthEfficiency: 0.65,
     maxBatchBoost: 10, maxStreams: 10, interconnect: "none",
-    instances: 1, redundant: false, noteKeys: [],
+    priceCheck: "RTX 6000 Ada", instances: 1, redundant: false, noteKeys: [],
   },
   {
     id: "rtxpro6000", category: "workstation-gpu", name: "Workstation, 1x RTX PRO 6000 Blackwell (96 GB)",
-    priceEUR: [9000, 12000], memGB: 96, memType: "vram",
+    priceEUR: [14500, 17500], memGB: 96, memType: "vram",
     bandwidthGBs: 1790, bandwidthEfficiency: 0.65,
     maxBatchBoost: 12, maxStreams: 12, interconnect: "none",
-    instances: 1, redundant: false, noteKeys: [],
+    priceCheck: "RTX PRO 6000 Blackwell", instances: 1, redundant: false, noteKeys: [],
   },
   {
     id: "dual-rtxpro6000", category: "workstation-gpu", name: "Workstation, 2x RTX PRO 6000 (192 GB)",
-    priceEUR: [20000, 25000], memGB: 192, memType: "vram",
+    priceEUR: [27000, 32000], memGB: 192, memType: "vram",
     bandwidthGBs: 2200, bandwidthEfficiency: 0.65,
     maxBatchBoost: 12, maxStreams: 14, interconnect: "pcie",
-    instances: 1, redundant: false, noteKeys: [],
+    priceCheck: "RTX PRO 6000 Blackwell", instances: 1, redundant: false, noteKeys: [],
   },
   {
     id: "mac-m3ultra", category: "apple", name: "Mac Studio M3 Ultra (512 GB unified)",
     priceEUR: [11000, 13000], memGB: 512, memType: "unified",
     bandwidthGBs: 819, bandwidthEfficiency: 0.6,
     maxBatchBoost: 2, maxStreams: 4, interconnect: "none",
-    instances: 1, redundant: false, noteKeys: [],
+    priceCheck: "Mac Studio M3 Ultra", instances: 1, redundant: false, noteKeys: [],
   },
   {
     id: "mac-cluster", category: "apple", name: "Cluster, 4x Mac Studio M3 Ultra (2 TB unified)",
-    priceEUR: [25000, 50000], memGB: 2048, memType: "unified",
+    priceEUR: [44000, 52000], memGB: 2048, memType: "unified",
     bandwidthGBs: 819, bandwidthEfficiency: 0.6,
     maxBatchBoost: 2, maxStreams: 4, interconnect: "tb-cluster",
-    instances: 1, redundant: false, noteKeys: [],
+    priceCheck: "Mac Studio M3 Ultra", instances: 1, redundant: false, noteKeys: [],
   },
   {
     id: "epyc-milan-1tb", category: "cpu-server", name: "Used server, EPYC Milan, 1 TB RAM",
     priceEUR: [2500, 3500], memGB: 1024, memType: "ram",
     bandwidthGBs: 200, bandwidthEfficiency: 0.5,
     maxBatchBoost: 2, maxStreams: 2, interconnect: "none",
-    instances: 1, redundant: false, noteKeys: ["hw.note.used"],
+    priceCheck: "AMD EPYC 7003 Server", instances: 1, redundant: false, noteKeys: ["hw.note.used"],
   },
   {
     id: "epyc-turin-dual", category: "cpu-server", name: "Server, 2x EPYC Turin, 1.5 TB RAM",
     priceEUR: [15000, 20000], memGB: 1536, memType: "ram",
     bandwidthGBs: 600, bandwidthEfficiency: 0.5,
     maxBatchBoost: 2, maxStreams: 4, interconnect: "none",
-    instances: 1, redundant: false, noteKeys: [],
+    priceCheck: "AMD EPYC 9005 Server", instances: 1, redundant: false, noteKeys: [],
   },
   {
     id: "server-4x-pro6000", category: "gpu-node", name: "GPU server, 4x RTX PRO 6000 (384 GB)",
-    priceEUR: [55000, 65000], memGB: 384, memType: "vram",
+    priceEUR: [60000, 70000], memGB: 384, memType: "vram",
     bandwidthGBs: 2200, bandwidthEfficiency: 0.65,
     maxBatchBoost: 12, maxStreams: 16, interconnect: "pcie",
-    instances: 1, redundant: false, noteKeys: [],
+    priceCheck: "RTX PRO 6000 Blackwell Server", instances: 1, redundant: false, noteKeys: [],
   },
   {
     id: "node-8x-pro6000", category: "gpu-node", name: "GPU server, 8x RTX PRO 6000 (768 GB)",
     priceEUR: [120000, 140000], memGB: 768, memType: "vram",
     bandwidthGBs: 2500, bandwidthEfficiency: 0.65,
     maxBatchBoost: 15, maxStreams: 16, interconnect: "pcie",
-    instances: 1, redundant: false, noteKeys: [],
+    priceCheck: "RTX PRO 6000 Blackwell Server", instances: 1, redundant: false, noteKeys: [],
   },
   {
     id: "cluster-3node", category: "gpu-cluster", name: "Redundant cluster, 3x (8x RTX PRO 6000), 2 active + 1 spare",
     priceEUR: [380000, 420000], memGB: 768, memType: "vram",
     bandwidthGBs: 2500, bandwidthEfficiency: 0.65,
     maxBatchBoost: 15, maxStreams: 16, interconnect: "pcie",
-    instances: 2, redundant: true, noteKeys: ["hw.note.redundant"],
+    priceCheck: "RTX PRO 6000 Blackwell Server", instances: 2, redundant: true, noteKeys: ["hw.note.redundant"],
   },
   {
     id: "cluster-8x-mi325x", category: "gpu-cluster", name: "GPU cluster, 8x AMD MI325X (2 TB HBM)",
-    priceEUR: [80000, 120000], memGB: 2048, memType: "vram",
+    priceEUR: [110000, 160000], memGB: 2048, memType: "vram",
     bandwidthGBs: 3000, bandwidthEfficiency: 0.65,
     maxBatchBoost: 16, maxStreams: 24, interconnect: "fabric",
-    instances: 1, redundant: false, noteKeys: ["hw.note.production"],
+    priceCheck: "AMD Instinct MI325X", instances: 1, redundant: false, noteKeys: ["hw.note.production"],
   },
 ];
 

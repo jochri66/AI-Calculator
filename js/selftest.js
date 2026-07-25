@@ -6,6 +6,7 @@ import {
   weightsGB, capacity, singleStreamTokS, maxUsefulStreams,
   usersServed, recommend, normalizeSovereignty, monthlyTokensPerSeat,
   cloudComparison, hybridPlan, selfHostMonthly, selfHostHorizons, powerKWhPerMonth,
+  redundancyEnergyFactor,
 } from "./calc.js";
 
 const model = (id) => MODELS.find((m) => m.id === id);
@@ -173,9 +174,20 @@ export function run() {
     Math.abs(hzFin1.year3 - (avgPrice + 36 * hzFin1.energy)) < 0.01,
     hzFin1.year3.toFixed(0));
 
-  // --- 10% margin baked into hardware prices ---
-  check("Margin: RTX 4090 price = 2420", hw("rtx4090").priceEUR[0] === 2420, String(hw("rtx4090").priceEUR[0]));
-  check("Margin: 4x server = 60500", server4x.priceEUR[0] === 60500, String(server4x.priceEUR[0]));
+  // --- 10% margin baked into hardware prices (base 3200 / 60000) ---
+  check("Margin: RTX 4090 system = 3520", hw("rtx4090").priceEUR[0] === 3520, String(hw("rtx4090").priceEUR[0]));
+  check("Margin: 4x server = 66000", server4x.priceEUR[0] === 66000, String(server4x.priceEUR[0]));
+
+  // --- Full-system sanity: complete system must cost more than its GPUs alone ---
+  // RTX PRO 6000 street price ~11.5k EUR/card (07/2026, memory shortage).
+  check("2x PRO 6000 system > 2 bare cards", hw("dual-rtxpro6000").priceEUR[0] > 2 * 11500,
+    String(hw("dual-rtxpro6000").priceEUR[0]));
+  check("1x PRO 6000 system > 1 bare card", hw("rtxpro6000").priceEUR[0] > 11500,
+    String(hw("rtxpro6000").priceEUR[0]));
+
+  // --- Redundancy energy: cold spare off, hot spare doubles ---
+  check("Cold spare: no extra energy", redundancyEnergyFactor("standby") === 0);
+  check("Hot spare: doubles energy", redundancyEnergyFactor("full") === 1);
 
   const failed = results.filter((r) => !r.pass);
   console.log(`\nSelf-test: ${results.length - failed.length}/${results.length} passed`);

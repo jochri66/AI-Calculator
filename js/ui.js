@@ -5,7 +5,7 @@ import { MODELS, HARDWARE, QUANTS, USE_CASES, PRICING_ASOF, COUNTRIES } from "./
 import {
   weightsGB, kvGBPerStream, overheadGB, usableMemGB, activeGBPerToken,
   capacity, recommend, cloudComparison, hybridPlan, seatsFromConcurrent,
-  powerKWhPerMonth,
+  powerKWhPerMonth, redundancyEnergyFactor,
 } from "./calc.js";
 import { t, fmtEUR, fmtNum } from "./i18n.js";
 
@@ -144,6 +144,7 @@ export function renderWizardResults(container, answers) {
     )}</p>
     ${missNote}
     ${cards}
+    ${priceNote()}
     ${hybridCard(answers)}
     ${caveats}
     <div class="cmp-section" data-cmp></div>
@@ -425,7 +426,25 @@ function resultCard(opt, badge, kind) {
             fmtEUR(Math.round(powerKWhPerMonth(opt.hw) * getKwh()))
           )}</div></div>
       </div>
+      ${priceCheckLink(opt.hw)}
     </div>`;
+}
+
+// One-line transparency note: prices are complete systems, not bare GPUs,
+// with links to price-comparison sites so nobody has to take our word for it.
+function priceNote() {
+  return `<p class="price-note">${esc(t("results.priceNote", { asof: PRICING_ASOF }))}
+    <a href="https://geizhals.de" target="_blank" rel="noopener">Geizhals</a> ·
+    <a href="https://www.idealo.de" target="_blank" rel="noopener">Idealo</a></p>`;
+}
+
+// External price-comparison link so people can verify our numbers themselves.
+function priceCheckLink(hw) {
+  if (!hw.priceCheck) return "";
+  const url = `https://geizhals.de/?fs=${encodeURIComponent(hw.priceCheck)}`;
+  return `<a class="price-check" href="${url}" target="_blank" rel="noopener">${esc(
+    t("results.priceCheck", { part: hw.priceCheck })
+  )} ↗</a>`;
 }
 
 // Redundancy add-on card: what fault tolerance costs on top of the primary pick.
@@ -445,6 +464,11 @@ function redundancyCard(rec, answers) {
 
   const extra = `${fmtEUR(hw.priceEUR[0])} – ${fmtEUR(hw.priceEUR[1])}`;
   const total = `${fmtEUR(hw.priceEUR[0] * 2)} – ${fmtEUR(hw.priceEUR[1] * 2)}`;
+  // Cold spare sits powered off (no extra energy); hot spare doubles the bill.
+  const extraKwh = powerKWhPerMonth(hw) * redundancyEnergyFactor(level);
+  const powerValue = extraKwh > 0
+    ? `+~${fmtNum(extraKwh, 0)} kWh · ${fmtEUR(Math.round(extraKwh * getKwh()))}`
+    : t("redcard.power.none");
   return `
     <div class="result-card secondary">
       <span class="result-badge">${esc(t("redcard.badge"))}</span>
@@ -455,6 +479,8 @@ function redundancyCard(rec, answers) {
           <div class="value">${esc(extra)}</div></div>
         <div class="stat"><div class="label">${esc(t("redcard.total"))}</div>
           <div class="value">${esc(total)}</div></div>
+        <div class="stat"><div class="label">${esc(t("redcard.power"))}</div>
+          <div class="value">${esc(powerValue)}</div></div>
       </div>
       <p class="rc-desc" style="margin-top:0.6rem">${esc(t(`redcard.note.${level}`))}</p>
     </div>`;
@@ -571,7 +597,7 @@ function renderExpertOutput(container, model, quant, ctx, streams) {
       return `
         <tr class="${fits ? "" : "nofit"}">
           <td>${esc(hw.name)}${badges}</td>
-          <td>${esc(priceRange(hw))}</td>
+          <td>${esc(priceRange(hw))}${hw.priceCheck ? ` <a class="price-check-sm" href="https://geizhals.de/?fs=${encodeURIComponent(hw.priceCheck)}" target="_blank" rel="noopener" title="${esc(t("results.priceCheck", { part: hw.priceCheck }))}">↗</a>` : ""}</td>
           <td class="${fits ? "fit-yes" : "fit-no"}">${esc(t(fits ? "expert.fitsYes" : "expert.fitsNo"))}</td>
           <td>${fits ? esc(tokRange(cap.single)) : "—"}</td>
           <td>${fits ? esc(tokRange(cap.perStream)) + (cap.streams < streams ? ` (${fmtNum(cap.streams)}×)` : "") : "—"}</td>
@@ -595,5 +621,6 @@ function renderExpertOutput(container, model, quant, ctx, streams) {
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
-    </div>`;
+    </div>
+    ${priceNote()}`;
 }

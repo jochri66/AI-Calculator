@@ -350,6 +350,13 @@ export function powerKWhPerMonth(hw) {
   return (hw.powerW * UTILIZATION * 24 * 365) / 12 / 1000;
 }
 
+// Extra energy multiplier of a redundancy level, relative to one system.
+// Cold spare ("standby") sits powered off on the shelf; a hot spare ("full")
+// runs alongside and doubles the energy bill.
+export function redundancyEnergyFactor(level) {
+  return level === "full" ? 1 : 0;
+}
+
 // Self-host running cost. Default: hardware paid 100% upfront, so the monthly
 // cost is electricity only and `upfront` carries the one-time price. With
 // amortMonths > 0 (financing over 1-5 years), the hardware share moves into

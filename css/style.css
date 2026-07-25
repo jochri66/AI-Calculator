@@ -481,6 +481,25 @@ input[type="range"]::-moz-range-thumb {
 .caveats h4 { color: var(--amber); font-size: 0.95rem; margin-bottom: 0.5rem; }
 .caveats ul { padding-left: 1.1rem; display: grid; gap: 0.45rem; font-size: 0.92rem; }
 
+/* price transparency: complete-system note + verify-yourself links */
+.price-note {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+.price-note a { color: var(--ink); font-weight: 600; }
+.price-check {
+  display: inline-block;
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--ink-soft);
+}
+.price-check:hover { color: var(--ink); border-bottom-color: var(--ink); }
+.price-check-sm { text-decoration: none; font-weight: 700; }
+
 /* ---------- expert mode ---------- */
 
 .expert-grid {
