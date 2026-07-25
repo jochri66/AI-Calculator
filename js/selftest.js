@@ -5,7 +5,7 @@ import { MODELS, HARDWARE, INDUSTRIES, CLOUD_PLANS, COUNTRIES } from "./data.js"
 import {
   weightsGB, capacity, singleStreamTokS, maxUsefulStreams,
   usersServed, recommend, normalizeSovereignty, monthlyTokensPerSeat,
-  cloudComparison, hybridPlan, selfHostMonthly, powerKWhPerMonth,
+  cloudComparison, hybridPlan, selfHostMonthly, selfHostHorizons, powerKWhPerMonth,
 } from "./calc.js";
 
 const model = (id) => MODELS.find((m) => m.id === id);
@@ -158,6 +158,20 @@ export function run() {
   check("Financed 3yrs: monthly includes hardware/36",
     Math.abs(fin3.monthly - (avgPrice / 36 + shDe.energy)) < 0.01 && fin3.upfront === 0,
     fin3.monthly.toFixed(0));
+
+  // Horizon totals: upfront stays OUT of year figures (shown separately);
+  // financing installments are IN.
+  const hzUp = selfHostHorizons(server4x, de.kwhEUR, 0);
+  check("Upfront: year3 = running costs only",
+    Math.abs(hzUp.year3 - 36 * hzUp.energy) < 0.01 && hzUp.upfront === avgPrice,
+    hzUp.year3.toFixed(0));
+  const hzFin1 = selfHostHorizons(server4x, de.kwhEUR, 12);
+  check("1yr financing: year1 includes full price",
+    Math.abs(hzFin1.year1 - (avgPrice + 12 * hzFin1.energy)) < 0.01,
+    hzFin1.year1.toFixed(0));
+  check("1yr financing: year3 adds no further hardware",
+    Math.abs(hzFin1.year3 - (avgPrice + 36 * hzFin1.energy)) < 0.01,
+    hzFin1.year3.toFixed(0));
 
   // --- 10% margin baked into hardware prices ---
   check("Margin: RTX 4090 price = 2420", hw("rtx4090").priceEUR[0] === 2420, String(hw("rtx4090").priceEUR[0]));

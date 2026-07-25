@@ -367,13 +367,14 @@ export function selfHostMonthly(hw, kwhEUR = KWH_EUR, amortMonths = 0) {
   };
 }
 
-// Totals over 1 and 3 years, honestly counting the upfront payment (or the
-// financing installments actually paid within the horizon).
+// Totals over 1 and 3 years. With upfront payment the one-time price stays a
+// separate figure (`upfront`) and the horizon totals contain running costs
+// only; with financing, the installments paid within the horizon are included.
 export function selfHostHorizons(hw, kwhEUR = KWH_EUR, amortMonths = 0) {
   const sh = selfHostMonthly(hw, kwhEUR, amortMonths);
   const price = (hw.priceEUR[0] + hw.priceEUR[1]) / 2;
   const paidBy = (months) =>
-    amortMonths > 0 ? Math.min(months, amortMonths) * (price / amortMonths) : price;
+    amortMonths > 0 ? Math.min(months, amortMonths) * (price / amortMonths) : 0;
   return {
     ...sh,
     year1: paidBy(12) + 12 * sh.energy,

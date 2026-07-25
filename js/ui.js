@@ -21,34 +21,32 @@ function amortMonths() {
   return cmpState.amortYears * 12;
 }
 
-function finText() {
-  return cmpState.amortYears === 0
-    ? t("fin.upfront")
-    : t("fin.years", { n: cmpState.amortYears });
-}
+const FIN_OPTIONS = [
+  { years: 0, key: "fin.upfront" },
+  { years: 1, key: "fin.y1" },
+  { years: 3, key: "fin.y3" },
+];
 
 function finSliderHTML() {
   return `
     <div class="fin-slider">
-      <div class="mix-head">
-        <span class="fin-label">${esc(t("fin.label"))}</span>
-        <output class="mix-value">${esc(finText())}</output>
+      <span class="fin-label">${esc(t("fin.label"))}</span>
+      <div class="cmp-horizon" style="margin-top:0.45rem">
+        ${FIN_OPTIONS.map(
+          (o) => `<button type="button" class="cmp-pill ${o.years === cmpState.amortYears ? "active" : ""}"
+            data-fin-years="${o.years}">${esc(t(o.key))}</button>`
+        ).join("")}
       </div>
-      <input type="range" data-fin min="0" max="5" step="1" value="${cmpState.amortYears}"
-        style="--pct:${(cmpState.amortYears / 5) * 100}%">
     </div>`;
 }
 
 function wireFinSlider(container, refresh) {
-  const el = container.querySelector("[data-fin]");
-  if (!el) return;
-  el.addEventListener("change", () => {
-    cmpState.amortYears = Number(el.value);
-    refresh();
-  });
-  el.addEventListener("input", () => {
-    el.style.setProperty("--pct", `${(Number(el.value) / 5) * 100}%`);
-  });
+  container.querySelectorAll("[data-fin-years]").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      cmpState.amortYears = Number(btn.dataset.finYears);
+      refresh();
+    })
+  );
 }
 
 // Self-host cost line that makes the payment model explicit.
@@ -259,10 +257,14 @@ export function renderComparison(container, opts) {
       const dim = o.flags.includes("noSov") ? " dim" : "";
       const self = o.kind === "selfhost" ? " self" : "";
       const label = o.kind === "selfhost" ? t("cmp.selfhost") : o.name;
-      const subLine =
-        o.kind === "selfhost" && horizon === "monthly"
+      let subLine = "";
+      if (o.kind === "selfhost") {
+        subLine = horizon === "monthly"
           ? `<span class="cmpsum-name">${esc(selfHostBreakdown(o))}</span>`
-          : "";
+          : o.upfront > 0
+            ? `<span class="cmpsum-name">${esc(t("cmpsum.plusUpfront", { price: fmtEUR(Math.round(o.upfront)) }))}</span>`
+            : "";
+      }
       return `
         <div class="cmp-row${dim}${self}">
           <div class="cmp-name">${esc(label)}${o.kind === "selfhost" ? "" : flagLabels(o.flags)}</div>
