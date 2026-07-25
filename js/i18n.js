@@ -142,6 +142,7 @@ export const STRINGS = {
     "hw.note.production": "Produktionsreife Rechenzentrums-Lösung (Strom, Kühlung, Wartung einplanen).",
     "hw.note.enterprise": "Enterprise-Klasse (OEM wie Dell/Supermicro): Preis pro Knoten inkl. Deployment und 36 Monate Support — Netzwerk, Switches und Racks kommen bei Multi-Node-Setups dazu.",
     "hw.note.rocm": "AMD ROCm statt CUDA: Läuft gut mit vLLM und den gängigen offenen Modellen, aber viele KI-Tools sind CUDA-first — prüf vorher, ob dein Software-Stack ROCm unterstützt.",
+    "hw.note.intel": "Intel-GPU-Stack (IPEX-LLM/vLLM) statt CUDA: unschlagbares VRAM pro Euro, aber das Software-Ökosystem ist jung — prüf vorher, ob deine Modelle und Tools unterstützt werden.",
 
     "expert.title": "Experten-Modus",
     "expert.desc":
@@ -279,6 +280,12 @@ export const STRINGS = {
     "cta.role.hardware": "Ingenieur, kein Verkäufer — plant, baut und betreibt die Systeme, auf denen deine KI läuft. Vom ersten Server bis zum redundanten Cluster, ehrlich gerechnet statt überdimensioniert verkauft.",
     "cta.role.coach": "Bringt KI in den Arbeitsalltag — ohne Buzzword-Bingo. Auch die Großen holen sich hier Rat.",
     "cta.follow": "Auf Instagram schreiben",
+
+    "results.scaledNote":
+      "Das sind {n} separate Server hinter einem Load Balancer — nicht mehr GPUs in einem Gehäuse. Die Nutzer werden auf die Server verteilt, die Kapazität skaliert praktisch linear. Rechne mit etwas Setup-Aufwand für Lastverteilung und Ausfall-Handling.",
+    "redcard.total.nplusone": "Gesamt ({n} Server, N+1)",
+    "redcard.nplusone":
+      "Bei mehreren Servern reicht ein einzelnes Reservesystem (N+1) — die komplette Flotte muss nicht verdoppelt werden.",
 
     "results.priceNote":
       "Alle Preise sind Komplettsysteme — CPU, RAM, NVMe-Speicher, Netzteil, Zusammenbau, Test, Garantie & Support inklusive, nicht nur die GPUs. Straßenpreise Stand {asof}: GPU-Preise sind wegen der Speicherknappheit stark gestiegen. Prüf die Preise gern selbst:",
@@ -433,6 +440,7 @@ export const STRINGS = {
     "hw.note.production": "Production-grade datacenter solution (plan for power, cooling, maintenance).",
     "hw.note.enterprise": "Enterprise class (OEM like Dell/Supermicro): per-node price includes deployment and 36 months of support — networking, switches and racks are extra in multi-node setups.",
     "hw.note.rocm": "AMD ROCm instead of CUDA: works well with vLLM and the common open models, but many AI tools are CUDA-first — check that your software stack supports ROCm before buying.",
+    "hw.note.intel": "Intel GPU stack (IPEX-LLM/vLLM) instead of CUDA: unbeatable VRAM per euro, but the software ecosystem is young — check that your models and tools are supported first.",
 
     "expert.title": "Expert mode",
     "expert.desc":
@@ -570,6 +578,12 @@ export const STRINGS = {
     "cta.role.hardware": "Engineer, not a salesman — designs, builds and runs the systems your AI lives on. From first server to redundant cluster, honestly calculated instead of oversold.",
     "cta.role.coach": "Gets AI into everyday work — zero buzzword bingo. Even the big players come here for advice.",
     "cta.follow": "DM on Instagram",
+
+    "results.scaledNote":
+      "That's {n} separate servers behind a load balancer — not more GPUs in one chassis. Users are distributed across the servers and capacity scales practically linearly. Expect some setup effort for load balancing and failure handling.",
+    "redcard.total.nplusone": "Total ({n} servers, N+1)",
+    "redcard.nplusone":
+      "With several servers a single spare system is enough (N+1) — no need to double the whole fleet.",
 
     "results.priceNote":
       "All prices are complete systems — CPU, RAM, NVMe storage, PSU, assembly, testing, warranty & support included, not just the GPUs. Street prices as of {asof}: GPU prices are heavily inflated by the memory shortage. Feel free to verify yourself:",

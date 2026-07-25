@@ -6,7 +6,7 @@ import {
   weightsGB, capacity, singleStreamTokS, maxUsefulStreams,
   usersServed, recommend, normalizeSovereignty, monthlyTokensPerSeat,
   cloudComparison, hybridPlan, selfHostMonthly, selfHostHorizons, powerKWhPerMonth,
-  redundancyEnergyFactor, rebalanceMix, cloudVerdict,
+  redundancyEnergyFactor, rebalanceMix, cloudVerdict, scaleHardware,
 } from "./calc.js";
 
 const model = (id) => MODELS.find((m) => m.id === id);
@@ -233,22 +233,54 @@ export function run() {
   const recChat250 = recommend({ users: 250, useCase: "chat", sovereignty: "hard", budgetId: "b5", quality: "best" });
   check("250 chat users: no capacity shortfall", !recChat250.capacityShort,
     recChat250.primary?.hw.id);
-  check("250 chat users: primary = H200 node", recChat250.primary?.hw.id === "node-8x-h200",
-    recChat250.primary?.hw.id);
+  check("250 chat users: demand covered", recChat250.primary?.maxUsers >= 250,
+    `${recChat250.primary?.hw.name} -> ${recChat250.primary?.maxUsers}`);
+  // With scale-out, 2x MI325X (242k) honestly undercuts one H200 node (363k).
+  check("250 chat users: cheapest capable setup wins",
+    recChat250.primary?.hw.priceEUR[0] <= hw("node-8x-h200").priceEUR[0],
+    `${recChat250.primary?.hw.name} @ ${recChat250.primary?.hw.priceEUR[0]}`);
 
-  // Agentic-heavy 250 users blow past every system: shortfall shows the two
-  // strongest options on different hardware (H200 node + redundant cluster).
+  // Agentic-heavy 250 users exceed any single box: the engine now scales OUT
+  // (n separate servers behind a load balancer) instead of apologizing.
   const recMix250 = recommend({
     users: 250, mix: { chat: 40, rag: 10, coding: 30, agentic: 20 },
     sovereignty: "hard", budgetId: "b5", quality: "best",
   });
-  check("250 mixed users: capacity shortfall", recMix250.capacityShort === true);
-  const shortIds = [recMix250.primary?.hw.id, recMix250.alternative?.hw.id];
+  check("250 mixed users: no shortfall — scaled out", recMix250.capacityShort === false,
+    recMix250.primary?.hw.name);
+  check("250 mixed users: primary is a multi-server setup",
+    (recMix250.primary?.hw.scaledCount ?? 1) >= 2, String(recMix250.primary?.hw.scaledCount));
+  check("250 mixed users: capacity covers demand", recMix250.primary?.maxUsers >= 250,
+    String(recMix250.primary?.maxUsers));
+
+  // 500 chat users: two H200-class boxes (or a cheaper scaled combo) cover it.
+  const rec500 = recommend({ users: 500, useCase: "chat", sovereignty: "hard", budgetId: "b5", quality: "best" });
+  check("500 chat users: no shortfall", rec500.capacityShort === false, rec500.primary?.hw.name);
+  check("500 chat users: covered by scaled setup", rec500.primary?.maxUsers >= 500,
+    `${rec500.primary?.hw.name} -> ${rec500.primary?.maxUsers}`);
+
+  // Beyond MAX_SCALE identical boxes the honest shortfall remains, with two
+  // different systems shown.
+  const recHuge = recommend({ users: 2000, useCase: "agentic", sovereignty: "hard", budgetId: "b5", quality: "best" });
+  check("2000 agentic users: capacity shortfall", recHuge.capacityShort === true);
   check("Shortfall shows two different systems",
-    !!recMix250.alternative && shortIds[0] !== shortIds[1], shortIds.join(" + "));
-  check("Shortfall includes H200 node and 3-node cluster",
-    shortIds.includes("node-8x-h200") && shortIds.includes("cluster-3node"),
-    shortIds.join(" + "));
+    !!recHuge.alternative && recHuge.primary?.hw.id !== recHuge.alternative?.hw.id,
+    `${recHuge.primary?.hw.id} + ${recHuge.alternative?.hw.id}`);
+
+  // --- scaleHardware mechanics ---
+  const base4x = hw("server-4x-pro6000");
+  const s3 = scaleHardware(base4x, 3);
+  check("scaleHardware: price/power/instances scale",
+    s3.priceEUR[0] === base4x.priceEUR[0] * 3 && s3.powerW === base4x.powerW * 3 && s3.instances === 3,
+    `${s3.priceEUR[0]} ${s3.powerW} ${s3.instances}`);
+  check("scaleHardware: name prefixed", s3.name.startsWith("3× "), s3.name);
+  check("scaleHardware: n=1 identity", scaleHardware(base4x, 1) === base4x);
+
+  // --- Intel Arc Pro B60 quad (Battlematrix class) ---
+  const b60 = hw("quad-b60-dual");
+  check("B60 quad margined price = 11000", b60.priceEUR[0] === 11000, String(b60.priceEUR[0]));
+  check("B60 quad fits Qwen3 235B Q4", capacity(model("qwen3-235b"), "q4", 8192, b60, 1).fits);
+  check("B60 quad does NOT fit K3 Q4", !capacity(k3, "q4", 8192, b60, 1).fits);
 
   // --- Cloud-vs-hardware verdict: subs and API judged separately ---
   // User-reported case: hardware beats every sub in ~8 months, only the API

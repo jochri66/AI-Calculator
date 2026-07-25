@@ -151,6 +151,17 @@ export const HARDWARE = [
     priceCheck: "RTX PRO 6000 Blackwell", instances: 1, redundant: false, noteKeys: [],
   },
   {
+    // Intel "Battlematrix" class: 4x Arc Pro B60 Dual cards = 8 GPUs,
+    // 192 GB VRAM total at a mid-four-figure price. Huge VRAM per euro,
+    // modest bandwidth (456 GB/s per GPU) and a young software stack.
+    id: "quad-b60-dual", category: "workstation-gpu", name: "Workstation, 4x Intel Arc Pro B60 Dual (192 GB)",
+    priceEUR: [10000, 14000], memGB: 192, memType: "vram",
+    bandwidthGBs: 1100, bandwidthEfficiency: 0.6,
+    maxBatchBoost: 8, maxStreams: 8, interconnect: "pcie",
+    priceCheck: "Intel Arc Pro B60 Dual", instances: 1, redundant: false,
+    noteKeys: ["hw.note.intel"],
+  },
+  {
     // AMD's PCIe Instinct card (05/2026): CDNA4, 144 GB HBM3E, 4 TB/s,
     // 600 W, dual-slot air-cooled — drop-in for standard PCIe Gen5 servers.
     id: "server-1x-mi350p", category: "gpu-node", name: "Server, 1x AMD MI350P (144 GB HBM3e)",
@@ -291,6 +302,7 @@ const POWER_W = {
   "rtx4090": 600, "rtx5090": 750, "rtx6000-ada": 500, "rtxpro6000": 700,
   "dual-rtxpro6000": 1100, "mac-m3ultra": 250, "mac-cluster": 1000,
   "epyc-milan-1tb": 500, "epyc-turin-dual": 800, "server-4x-pro6000": 2500,
+  "quad-b60-dual": 1500,
   "server-1x-mi350p": 750, "server-4x-mi350p": 2900,
   "node-8x-pro6000": 4500, "node-8x-h200": 7500,
   "cluster-3node": 10000, "cluster-8x-mi325x": 8000,

@@ -428,6 +428,9 @@ function resultCard(opt, badge, kind) {
             fmtEUR(Math.round(powerKWhPerMonth(opt.hw) * getKwh()))
           )}</div></div>
       </div>
+      ${opt.hw.scaledCount > 1
+        ? `<p class="rc-desc" style="margin-top:0.6rem">${esc(t("results.scaledNote", { n: opt.hw.scaledCount }))}</p>`
+        : ""}
       ${priceCheckLink(opt.hw)}
     </div>`;
 }
@@ -464,10 +467,19 @@ function redundancyCard(rec, answers) {
       </div>`;
   }
 
-  const extra = `${fmtEUR(hw.priceEUR[0])} – ${fmtEUR(hw.priceEUR[1])}`;
-  const total = `${fmtEUR(hw.priceEUR[0] * 2)} – ${fmtEUR(hw.priceEUR[1] * 2)}`;
-  // Cold spare sits powered off (no extra energy); hot spare doubles the bill.
-  const extraKwh = powerKWhPerMonth(hw) * redundancyEnergyFactor(level);
+  // With n scaled-out servers a spare is +1 box (N+1), not a full second
+  // fleet; single systems keep the plain second-system model.
+  const count = hw.scaledCount || 1;
+  const unitLo = hw.priceEUR[0] / count;
+  const unitHi = hw.priceEUR[1] / count;
+  const extra = `${fmtEUR(unitLo)} – ${fmtEUR(unitHi)}`;
+  const total = `${fmtEUR(hw.priceEUR[0] + unitLo)} – ${fmtEUR(hw.priceEUR[1] + unitHi)}`;
+  const totalLabel = count > 1
+    ? t("redcard.total.nplusone", { n: count + 1 })
+    : t("redcard.total");
+  // Cold spare sits powered off (no extra energy); a hot spare adds one
+  // running unit's energy (which doubles the bill for single systems).
+  const extraKwh = (powerKWhPerMonth(hw) / count) * redundancyEnergyFactor(level);
   const powerValue = extraKwh > 0
     ? `+~${fmtNum(extraKwh, 0)} kWh · ${fmtEUR(Math.round(extraKwh * getKwh()))}`
     : t("redcard.power.none");
@@ -475,16 +487,16 @@ function redundancyCard(rec, answers) {
     <div class="result-card secondary">
       <span class="result-badge">${esc(t("redcard.badge"))}</span>
       <div class="result-headline">${esc(t(`redcard.headline.${level}`))}</div>
-      <div class="result-sub">2× ${esc(hw.name)}</div>
+      <div class="result-sub">${count > 1 ? `${count + 1}× ` : "2× "}${esc(hw.scaledCount > 1 ? hw.name.replace(/^\d+× /, "") : hw.name)}</div>
       <div class="stat-grid">
         <div class="stat"><div class="label">${esc(t("redcard.extra"))}</div>
           <div class="value">${esc(extra)}</div></div>
-        <div class="stat"><div class="label">${esc(t("redcard.total"))}</div>
+        <div class="stat"><div class="label">${esc(totalLabel)}</div>
           <div class="value">${esc(total)}</div></div>
         <div class="stat"><div class="label">${esc(t("redcard.power"))}</div>
           <div class="value">${esc(powerValue)}</div></div>
       </div>
-      <p class="rc-desc" style="margin-top:0.6rem">${esc(t(`redcard.note.${level}`))}</p>
+      <p class="rc-desc" style="margin-top:0.6rem">${esc(t(`redcard.note.${level}`))}${count > 1 ? ` ${esc(t("redcard.nplusone"))}` : ""}</p>
     </div>`;
 }
 

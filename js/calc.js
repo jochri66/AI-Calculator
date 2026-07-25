@@ -183,6 +183,25 @@ function tiersForQuality(quality, budgetIdx) {
   return ["mid", "large-moe"]; // "best"; frontier added separately when eligible
 }
 
+// When one box can't serve the demand, we scale OUT: n separate, identical
+// servers behind a load balancer (users shard across boxes — no inter-node
+// model traffic), so streams, price and power scale ~linearly. Beyond
+// MAX_SCALE identical boxes an individually planned cluster is the honest
+// answer, so the capacity-shortfall path still exists past that.
+export const MAX_SCALE = 6;
+
+export function scaleHardware(hw, n) {
+  if (n <= 1) return hw;
+  return {
+    ...hw,
+    instances: (hw.instances || 1) * n,
+    priceEUR: [hw.priceEUR[0] * n, hw.priceEUR[1] * n],
+    powerW: hw.powerW * n,
+    scaledCount: n,
+    name: `${n}× ${hw.name}`,
+  };
+}
+
 function buildOption(pair, blend) {
   const maxStreams = maxUsefulStreams(pair.model, pair.quant, blend.ctx, pair.hw, blend.minTokS);
   return {
@@ -226,7 +245,22 @@ export function recommend(answers) {
         const cap = capacity(model, quant, ctx, hw, needStreams);
         if (!cap.fits) continue;
         if (cap.perStream < blend.minTokS) continue;
-        if (cap.streams < needStreams) continue;
+        if (cap.streams < needStreams) {
+          // One box is short — try n separate servers behind a load balancer.
+          const mus = maxUsefulStreams(model, quant, ctx, hw, blend.minTokS);
+          if (mus <= 0) continue;
+          const n = Math.ceil(needStreams / mus);
+          if (n < 2 || n > MAX_SCALE) continue;
+          const scaled = scaleHardware(hw, n);
+          const scaledCap = capacity(model, quant, ctx, scaled, needStreams);
+          if (scaledCap.streams < needStreams) continue;
+          pairs.push({
+            model, quant, hw: scaled, cap: scaledCap,
+            price: scaled.priceEUR[0],
+            inBudget: scaled.priceEUR[0] <= budgetMax,
+          });
+          continue;
+        }
         pairs.push({
           model, quant, hw, cap,
           price: hw.priceEUR[0],
