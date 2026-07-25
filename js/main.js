@@ -48,19 +48,45 @@ function collectAnswers() {
   };
 }
 
-// Live slider feedback: normalized share labels + gradient track fill.
+// Auto-balancing sliders: the four shares always sum to 100%. Dragging one
+// slider redistributes the remainder across the others, proportional to their
+// current values (equal split when the others are all at zero).
 function initMixSliders() {
   const sliders = [...document.querySelectorAll("[data-mix]")];
-  const update = () => {
-    const total = sliders.reduce((s, el) => s + Number(el.value), 0);
+
+  const paint = () => {
     sliders.forEach((el) => {
       el.style.setProperty("--pct", `${el.value}%`);
-      const share = total > 0 ? Math.round((Number(el.value) / total) * 100) : 0;
-      document.querySelector(`[data-mix-out="${el.dataset.mix}"]`).textContent = `${share}%`;
+      document.querySelector(`[data-mix-out="${el.dataset.mix}"]`).textContent = `${el.value}%`;
     });
   };
-  sliders.forEach((el) => el.addEventListener("input", update));
-  update();
+
+  const rebalance = (changed) => {
+    const v = Math.min(100, Math.max(0, Math.round(Number(changed.value))));
+    changed.value = String(v);
+    const others = sliders.filter((el) => el !== changed);
+    const rest = 100 - v;
+    const sumOthers = others.reduce((s, el) => s + Number(el.value), 0);
+
+    // Float shares -> floors, then hand out leftover points by largest fraction.
+    const raw = others.map((el) =>
+      sumOthers > 0 ? (Number(el.value) / sumOthers) * rest : rest / others.length
+    );
+    const floors = raw.map(Math.floor);
+    let leftover = rest - floors.reduce((s, n) => s + n, 0);
+    raw
+      .map((r, i) => ({ i, frac: r - floors[i] }))
+      .sort((a, b) => b.frac - a.frac)
+      .forEach(({ i }) => { if (leftover > 0) { floors[i] += 1; leftover -= 1; } });
+
+    others.forEach((el, i) => { el.value = String(floors[i]); });
+    paint();
+  };
+
+  sliders.forEach((el) =>
+    el.addEventListener("input", () => rebalance(el))
+  );
+  paint();
 }
 
 function showResults() {

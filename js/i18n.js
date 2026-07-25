@@ -153,9 +153,12 @@ export const STRINGS = {
 
     "cta.title": "Bock, das umzusetzen?",
     "cta.body":
-      "Wir planen und bauen solche Systeme — vom Workstation-Einstieg bis zum redundanten Cluster. Schreib uns auf Instagram, wir rechnen dein Szenario unverbindlich durch.",
-    "cta.button": "Schreib @jochri66",
+      "Dieser Rechner ist ein gemeinsames Projekt: Hardware-Expertise trifft KI-Beratung. Schreib uns auf Instagram — wir rechnen dein Szenario unverbindlich durch.",
+    "cta.role.hardware": "Der Hardware-Experte — plant und baut deine KI-Server, vom Workstation-Einstieg bis zum redundanten Cluster.",
+    "cta.role.coach": "KI-Beratung, der große Unternehmen vertrauen — Strategie und Einführung im Betrieb.",
+    "cta.follow": "Auf Instagram schreiben",
 
+    "footer.joint": "Ein gemeinsames Projekt von",
     "footer.imprint": "Impressum",
     "footer.privacy": "Datenschutz",
     "unit.gb": "GB",
@@ -312,9 +315,12 @@ export const STRINGS = {
 
     "cta.title": "Ready to build this?",
     "cta.body":
-      "We design and build systems like these — from workstation entry points to redundant clusters. DM us on Instagram and we'll run your scenario, no strings attached.",
-    "cta.button": "DM @jochri66",
+      "This calculator is a joint project: hardware expertise meets AI consulting. DM us on Instagram — we'll run your scenario, no strings attached.",
+    "cta.role.hardware": "The hardware expert — designs and builds your AI servers, from workstation entry points to redundant clusters.",
+    "cta.role.coach": "AI consulting that big corporations trust — strategy and rollout for your business.",
+    "cta.follow": "DM on Instagram",
 
+    "footer.joint": "A joint project by",
     "footer.imprint": "Imprint",
     "footer.privacy": "Privacy",
     "unit.gb": "GB",
