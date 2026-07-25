@@ -1,12 +1,20 @@
 // Rendering: wizard results, expert mode. All text through t() so language
 // switches can re-render live.
 
-import { MODELS, HARDWARE, QUANTS, USE_CASES, PRICING_ASOF } from "./data.js";
+import { MODELS, HARDWARE, QUANTS, USE_CASES, PRICING_ASOF, COUNTRIES } from "./data.js";
 import {
   weightsGB, kvGBPerStream, overheadGB, usableMemGB, activeGBPerToken,
   capacity, recommend, cloudComparison, hybridPlan, seatsFromConcurrent,
+  powerKWhPerMonth,
 } from "./calc.js";
 import { t, fmtEUR, fmtNum } from "./i18n.js";
+
+// Comparison view state shared between wizard results and the compare tab.
+const cmpState = { horizon: "monthly", country: "de" };
+
+function getKwh() {
+  return (COUNTRIES.find((c) => c.id === cmpState.country) || COUNTRIES[0]).kwhEUR;
+}
 
 const CTX_STOPS = [4096, 8192, 16384, 32768, 65536, 131072];
 
@@ -61,6 +69,7 @@ export function renderWizardResults(container, answers) {
 
   const cards = [
     resultCard(rec.primary, primaryBadge, "primary"),
+    redundancyCard(rec, answers),
     rec.alternative
       ? resultCard(rec.alternative, `<span class="result-badge">${esc(t("results.badge.alt"))}</span>`, "secondary")
       : "",
@@ -69,10 +78,14 @@ export function renderWizardResults(container, answers) {
       : "",
   ].join("");
 
-  const caveats = rec.caveats.length
+  const caveatKeys = [...rec.caveats];
+  if ((answers.redundancy ?? "none") === "none" && rec.users >= 25) {
+    caveatKeys.push("caveat.noRedundancy");
+  }
+  const caveats = caveatKeys.length
     ? `<div class="caveats">
          <h4>${esc(t("results.caveatsTitle"))}</h4>
-         <ul>${rec.caveats.map((k) => `<li>${esc(t(k))}</li>`).join("")}</ul>
+         <ul>${caveatKeys.map((k) => `<li>${esc(t(k))}</li>`).join("")}</ul>
        </div>`
     : "";
 
@@ -97,6 +110,8 @@ export function renderWizardResults(container, answers) {
     intensity: "normal",
     hw: rec.primary?.hw ?? null,
     sovereigntyPct: rec.sovereigntyPct,
+    // Country switch affects the power stat and hybrid card too — re-render all.
+    onRefresh: () => renderWizardResults(container, answers),
   });
 }
 
@@ -108,10 +123,9 @@ function flagBadges(flags) {
     .join("");
 }
 
-export function renderComparison(container, opts, horizon) {
-  horizon = horizon || container.dataset.horizon || "monthly";
-  container.dataset.horizon = horizon;
-  const cmp = cloudComparison(opts);
+export function renderComparison(container, opts) {
+  const horizon = cmpState.horizon;
+  const cmp = cloudComparison({ ...opts, kwhEUR: getKwh() });
   const max = Math.max(...cmp.options.map((o) => o[horizon]));
 
   const pills = ["monthly", "year1", "year3"]
@@ -120,6 +134,15 @@ export function renderComparison(container, opts, horizon) {
         ${esc(t(`cmp.horizon.${h}`))}</button>`
     )
     .join("");
+
+  const countrySelect = `
+    <label class="cmp-country">
+      <span>${esc(t("cmp.country"))}</span>
+      <select data-country>${COUNTRIES.map(
+        (c) => `<option value="${c.id}" ${c.id === cmpState.country ? "selected" : ""}>
+          ${esc(t(`country.${c.id}`))} (${fmtNum(c.kwhEUR, 2)} €/kWh)</option>`
+      ).join("")}</select>
+    </label>`;
 
   const rows = cmp.options
     .map((o) => {
@@ -146,20 +169,32 @@ export function renderComparison(container, opts, horizon) {
 
   container.innerHTML = `
     ${opts.titleKey ? `<h3>${esc(t(opts.titleKey))}</h3>` : ""}
-    <div class="cmp-horizon">${pills}</div>
+    <div class="cmp-controls">
+      <div class="cmp-horizon">${pills}</div>
+      ${countrySelect}
+    </div>
     <div class="cmp-rows">${rows}</div>
     <p class="cmp-assume">${esc(
       t("cmp.assumptions", {
         seats: fmtNum(opts.seats),
         mtok: fmtNum((cmp.tokens.inTok + cmp.tokens.outTok) / 1e6, 1),
+        kwh: fmtNum(getKwh(), 2),
         date: PRICING_ASOF,
       })
     )}</p>
     <ul class="cmp-caveats">${caveats.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>`;
 
+  const refresh = opts.onRefresh || (() => renderComparison(container, opts));
   container.querySelectorAll("[data-horizon]").forEach((btn) =>
-    btn.addEventListener("click", () => renderComparison(container, opts, btn.dataset.horizon))
+    btn.addEventListener("click", () => {
+      cmpState.horizon = btn.dataset.horizon;
+      refresh();
+    })
   );
+  container.querySelector("[data-country]").addEventListener("change", (e) => {
+    cmpState.country = e.target.value;
+    refresh();
+  });
 }
 
 // Standalone "Cloud vs. Local" tab: auto-picks a matching self-host config
@@ -172,15 +207,15 @@ export function renderCompareTab(container, { seats, intensity, mix }) {
     budgetId: "b5",
     quality: "good",
   });
-  renderComparison(
-    container,
-    { seats, intensity, mix, hw: rec.primary?.hw ?? null, sovereigntyPct: 0 },
-    container.dataset.horizon
-  );
+  renderComparison(container, {
+    seats, intensity, mix,
+    hw: rec.primary?.hw ?? null,
+    sovereigntyPct: 0,
+  });
 }
 
 function hybridCard(answers) {
-  const h = hybridPlan(answers);
+  const h = hybridPlan(answers, getKwh());
   if (!h) return "";
   return `
     <div class="result-card hybrid">
@@ -257,7 +292,43 @@ function resultCard(opt, badge, kind) {
           <div class="value">${esc(t("results.usersUnit", { n: fmtNum(opt.maxUsers) }))}</div></div>
         <div class="stat"><div class="label">${esc(t("results.memory"))}</div>
           <div class="value">${esc(memLine)}</div></div>
+        <div class="stat"><div class="label">${esc(t("results.power"))}</div>
+          <div class="value">~${fmtNum(powerKWhPerMonth(opt.hw), 0)} kWh · ${esc(
+            fmtEUR(Math.round(powerKWhPerMonth(opt.hw) * getKwh()))
+          )}</div></div>
       </div>
+    </div>`;
+}
+
+// Redundancy add-on card: what fault tolerance costs on top of the primary pick.
+function redundancyCard(rec, answers) {
+  const level = answers.redundancy ?? "none";
+  if (level === "none" || !rec.primary) return "";
+  const hw = rec.primary.hw;
+
+  if (level === "full" && hw.redundant) {
+    return `
+      <div class="result-card secondary">
+        <span class="result-badge">${esc(t("redcard.badge"))}</span>
+        <div class="result-headline">${esc(t("redcard.builtin"))}</div>
+        <p class="rc-desc">${esc(t("red.explain"))}</p>
+      </div>`;
+  }
+
+  const extra = `${fmtEUR(hw.priceEUR[0])} – ${fmtEUR(hw.priceEUR[1])}`;
+  const total = `${fmtEUR(hw.priceEUR[0] * 2)} – ${fmtEUR(hw.priceEUR[1] * 2)}`;
+  return `
+    <div class="result-card secondary">
+      <span class="result-badge">${esc(t("redcard.badge"))}</span>
+      <div class="result-headline">${esc(t(`redcard.headline.${level}`))}</div>
+      <div class="result-sub">2× ${esc(hw.name)}</div>
+      <div class="stat-grid">
+        <div class="stat"><div class="label">${esc(t("redcard.extra"))}</div>
+          <div class="value">${esc(extra)}</div></div>
+        <div class="stat"><div class="label">${esc(t("redcard.total"))}</div>
+          <div class="value">${esc(total)}</div></div>
+      </div>
+      <p class="rc-desc" style="margin-top:0.6rem">${esc(t(`redcard.note.${level}`))}</p>
     </div>`;
 }
 

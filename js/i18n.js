@@ -173,6 +173,41 @@ export const STRINGS = {
     "tier.large-moe": "Großes MoE-Modell",
     "tier.frontier-moe": "Frontier-Modell",
 
+    "wizard.step.red.title": "Wie schlimm ist es, wenn die KI mal ausfällt?",
+    "wizard.step.red.desc":
+      "Auch Server fallen aus: Netzteil, GPU, Software-Update, Stromausfall. Redundanz heißt: Ein zweites System steht bereit und übernimmt.",
+    "red.none": "Kann mal ausfallen",
+    "red.none.desc": "Ein System reicht — ein Tag Ausfall wäre ärgerlich, aber kein Drama",
+    "red.standby": "Sollte schnell wieder laufen",
+    "red.standby.desc": "Zweites System als Standby — bei Ausfall manuell umschalten (Minuten bis Stunden)",
+    "red.full": "Muss immer laufen",
+    "red.full.desc": "Automatischer Failover — Ausfall eines Systems merkt niemand",
+    "red.explain.title": "Warum das wichtig ist:",
+    "red.explain":
+      "Ohne Redundanz ist dein KI-Server ein Single Point of Failure — fällt er aus, steht die KI für das ganze Team, bis Ersatz läuft. Redundanz kostet grob das Doppelte an Hardware, dafür arbeitet dein Team weiter, wenn ein System stirbt. Backups ersetzen keine Redundanz: Sie retten deine Daten, nicht deine Verfügbarkeit.",
+
+    "redcard.badge": "Ausfallsicherheit",
+    "redcard.headline.standby": "Zweites System als Standby",
+    "redcard.headline.full": "Zwei Systeme mit automatischem Failover",
+    "redcard.builtin":
+      "Schon eingebaut: Diese Konfiguration ist redundant ausgelegt (aktive Knoten + Reserve).",
+    "redcard.extra": "Mehrkosten",
+    "redcard.total": "Gesamt (2 Systeme)",
+    "redcard.note.standby":
+      "Beim Ausfall schaltest du (oder wir) manuell um — rechne mit Minuten bis Stunden Unterbrechung. Der Standby kann bis dahin als Test- oder Entwicklungssystem arbeiten.",
+    "redcard.note.full":
+      "Load Balancer verteilt auf beide Systeme; fällt eins aus, übernimmt das andere automatisch — dein Team merkt nichts. Etwas Einrichtungsaufwand kommt dazu.",
+    "caveat.noRedundancy":
+      "Ein einzelnes System ist ein Single Point of Failure. Ab ~25 Nutzern lohnt sich ein Standby-System — sonst steht bei einem Defekt das ganze Team.",
+
+    "country.de": "Deutschland",
+    "country.at": "Österreich",
+    "country.ch": "Schweiz",
+    "country.eu": "EU-Durchschnitt",
+    "country.us": "USA",
+    "cmp.country": "Strompreis",
+    "results.power": "Strom/Monat",
+
     "cmp.title": "Cloud vs. Lokal",
     "cmp.desc":
       "Was kosten ChatGPT, Claude & Gemini im Vergleich zu eigener Hardware? Team-Größe und Nutzung einstellen — die Balken rechnen live.",
@@ -188,7 +223,7 @@ export const STRINGS = {
     "cmp.selfhost": "Eigene Hardware",
     "cmp.perMonth": "/Monat",
     "cmp.assumptions":
-      "Annahmen: {seats} Lizenzen, ca. {mtok} Mio. Token pro Kopf und Monat, 21 Arbeitstage. Eigene Hardware: Anschaffung auf 36 Monate umgelegt + Strom (0,30 €/kWh). Listenpreise Stand {date}, netto, gerundet.",
+      "Annahmen: {seats} Lizenzen, ca. {mtok} Mio. Token pro Kopf und Monat, 21 Arbeitstage. Eigene Hardware: Anschaffung auf 36 Monate umgelegt + Strom ({kwh} €/kWh, Ø 40 % Auslastung). Listenpreise Stand {date}, netto, gerundet.",
     "cmp.caveat.quality":
       "Fairerweise: Die geschlossenen Frontier-Modelle (GPT, Claude, Gemini) sind aktuell stärker als lokale Modelle derselben Preisklasse.",
     "cmp.caveat.seats": "Annahme: ca. 3 Lizenzen je gleichzeitigem Nutzer.",
@@ -210,7 +245,7 @@ export const STRINGS = {
     "cta.title": "Bock, das umzusetzen?",
     "cta.body":
       "Zwei Leute, ein Projekt: Einer baut die Hardware, einer bringt KI in Unternehmen. Schreib uns einfach — wir schauen uns dein Szenario unverbindlich an.",
-    "cta.role.hardware": "Baut die Kisten, auf denen deine KI läuft — vom ersten Server bis zum Cluster. Ehrlich beraten statt überdimensioniert verkauft.",
+    "cta.role.hardware": "Ingenieur, kein Verkäufer — plant, baut und betreibt die Systeme, auf denen deine KI läuft. Vom ersten Server bis zum redundanten Cluster, ehrlich gerechnet statt überdimensioniert verkauft.",
     "cta.role.coach": "Bringt KI in den Arbeitsalltag — ohne Buzzword-Bingo. Auch die Großen holen sich hier Rat.",
     "cta.follow": "Auf Instagram schreiben",
 
@@ -391,6 +426,41 @@ export const STRINGS = {
     "tier.large-moe": "Large MoE model",
     "tier.frontier-moe": "Frontier model",
 
+    "wizard.step.red.title": "How bad is it if the AI goes down for a while?",
+    "wizard.step.red.desc":
+      "Servers fail too: power supply, GPU, software update, outage. Redundancy means a second system stands ready and takes over.",
+    "red.none": "Can go down occasionally",
+    "red.none.desc": "One system is enough — a day of downtime would be annoying, not a disaster",
+    "red.standby": "Should recover quickly",
+    "red.standby.desc": "Second system on standby — manual switchover on failure (minutes to hours)",
+    "red.full": "Must always run",
+    "red.full.desc": "Automatic failover — nobody notices when one system dies",
+    "red.explain.title": "Why this matters:",
+    "red.explain":
+      "Without redundancy your AI server is a single point of failure — if it dies, AI is down for the whole team until a replacement runs. Redundancy roughly doubles the hardware cost, but your team keeps working when one system dies. Backups are not redundancy: they save your data, not your uptime.",
+
+    "redcard.badge": "Fault tolerance",
+    "redcard.headline.standby": "Second system on standby",
+    "redcard.headline.full": "Two systems with automatic failover",
+    "redcard.builtin":
+      "Already built in: this configuration is designed redundantly (active nodes + spare).",
+    "redcard.extra": "Extra cost",
+    "redcard.total": "Total (2 systems)",
+    "redcard.note.standby":
+      "On failure you (or we) switch over manually — expect minutes to hours of interruption. Until then the standby can double as a test or development system.",
+    "redcard.note.full":
+      "A load balancer spreads work across both systems; if one fails the other takes over automatically — your team notices nothing. Adds some setup effort.",
+    "caveat.noRedundancy":
+      "A single system is a single point of failure. From ~25 users a standby system pays off — otherwise one defect stops the whole team.",
+
+    "country.de": "Germany",
+    "country.at": "Austria",
+    "country.ch": "Switzerland",
+    "country.eu": "EU average",
+    "country.us": "USA",
+    "cmp.country": "Electricity price",
+    "results.power": "Power/month",
+
     "cmp.title": "Cloud vs. local",
     "cmp.desc":
       "What do ChatGPT, Claude & Gemini cost compared to your own hardware? Set team size and usage — the bars recalculate live.",
@@ -406,7 +476,7 @@ export const STRINGS = {
     "cmp.selfhost": "Own hardware",
     "cmp.perMonth": "/month",
     "cmp.assumptions":
-      "Assumptions: {seats} licenses, ~{mtok}M tokens per person per month, 21 working days. Own hardware: purchase amortized over 36 months + power (€0.30/kWh). List prices as of {date}, net, rounded.",
+      "Assumptions: {seats} licenses, ~{mtok}M tokens per person per month, 21 working days. Own hardware: purchase amortized over 36 months + power ({kwh} €/kWh, avg. 40% utilization). List prices as of {date}, net, rounded.",
     "cmp.caveat.quality":
       "To be fair: the closed frontier models (GPT, Claude, Gemini) are currently stronger than local models in the same price class.",
     "cmp.caveat.seats": "Assumption: ~3 licenses per concurrent user.",
@@ -428,7 +498,7 @@ export const STRINGS = {
     "cta.title": "Ready to build this?",
     "cta.body":
       "Two people, one project: one builds the hardware, one gets AI into companies. Just hit us up — we'll look at your scenario, no strings attached.",
-    "cta.role.hardware": "Builds the boxes your AI runs on — from first server to full cluster. Honest advice, no oversized upsells.",
+    "cta.role.hardware": "Engineer, not a salesman — designs, builds and runs the systems your AI lives on. From first server to redundant cluster, honestly calculated instead of oversold.",
     "cta.role.coach": "Gets AI into everyday work — zero buzzword bingo. Even the big players come here for advice.",
     "cta.follow": "DM on Instagram",
 

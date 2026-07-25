@@ -345,13 +345,20 @@ export function monthlyTokensPerSeat(mix, intensity = "normal") {
   };
 }
 
-// Self-host running cost: hardware amortized over AMORT_MONTHS + electricity.
-export function selfHostMonthly(hw) {
+// Average monthly energy draw of a system, kWh.
+export function powerKWhPerMonth(hw) {
+  return (hw.powerW * UTILIZATION * 24 * 365) / 12 / 1000;
+}
+
+// Self-host running cost: hardware amortized over AMORT_MONTHS + electricity
+// at the given country's business rate.
+export function selfHostMonthly(hw, kwhEUR = KWH_EUR) {
   const price = (hw.priceEUR[0] + hw.priceEUR[1]) / 2;
-  const energy = ((hw.powerW * UTILIZATION * 24 * 365) / 12 / 1000) * KWH_EUR;
+  const energy = powerKWhPerMonth(hw) * kwhEUR;
   return {
     hardware: price / AMORT_MONTHS,
     energy,
+    kwh: powerKWhPerMonth(hw),
     monthly: price / AMORT_MONTHS + energy,
   };
 }
@@ -362,7 +369,7 @@ function horizons(monthly) {
 
 // Full comparison: subscriptions + APIs (+ optional self-host row).
 // sovereigntyPct >= 80 marks every cloud option as violating the requirement.
-export function cloudComparison({ seats, mix, intensity = "normal", hw = null, sovereigntyPct = 0 }) {
+export function cloudComparison({ seats, mix, intensity = "normal", hw = null, sovereigntyPct = 0, kwhEUR = KWH_EUR }) {
   const m = normalizeMix(mix);
   const tokens = monthlyTokensPerSeat(m, intensity);
   const noSov = normalizeSovereignty(sovereigntyPct) >= 80;
@@ -370,7 +377,7 @@ export function cloudComparison({ seats, mix, intensity = "normal", hw = null, s
   const options = [];
 
   if (hw) {
-    const sh = selfHostMonthly(hw);
+    const sh = selfHostMonthly(hw, kwhEUR);
     options.push({
       id: "selfhost", kind: "selfhost", provider: "", name: hw.name,
       ...horizons(sh.monthly), flags: [],
@@ -404,7 +411,7 @@ export function seatsFromConcurrent(users) {
 // Hybrid plan for 0 < sovereigntyPct < 100: size hardware for the local share
 // of the workload, price the remaining share via the cheapest suitable cloud
 // option, and report the cost split.
-export function hybridPlan(answers) {
+export function hybridPlan(answers, kwhEUR = KWH_EUR) {
   const sovPct = normalizeSovereignty(answers.sovereigntyPct ?? answers.sovereignty);
   if (sovPct <= 0 || sovPct >= 100) return null;
 
@@ -423,7 +430,7 @@ export function hybridPlan(answers) {
   );
   const cloud = candidates.sort((a, b) => a.monthly - b.monthly)[0];
 
-  const local = selfHostMonthly(rec.primary.hw);
+  const local = selfHostMonthly(rec.primary.hw, kwhEUR);
   const monthly = local.monthly + cloud.monthly;
   return {
     sovereigntyPct: sovPct,

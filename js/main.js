@@ -4,7 +4,7 @@ import { INDUSTRIES } from "./data.js";
 import { initLang, setLang, getLang, applyTranslations, t } from "./i18n.js";
 import { renderWizardResults, rerenderResults, initExpert, renderCompareTab } from "./ui.js";
 
-const STEPS = 6;
+const STEPS = 7;
 let currentStep = 0;
 let expertApi = null;
 let wizardSliders = null;
@@ -43,6 +43,7 @@ function collectAnswers() {
     sovereigntyPct: Number($("sov-range").value),
     budgetId: fd.get("budgetId"),
     quality: fd.get("quality"),
+    redundancy: fd.get("redundancy"),
   };
 }
 

@@ -263,3 +263,12 @@ const POWER_W = {
   "node-8x-pro6000": 4500, "cluster-3node": 10000, "cluster-8x-mi325x": 8000,
 };
 HARDWARE.forEach((h) => { h.powerW = POWER_W[h.id] ?? 500; });
+
+// Business electricity prices per country, EUR/kWh (net, approx.)
+export const COUNTRIES = [
+  { id: "de", kwhEUR: 0.3 },
+  { id: "at", kwhEUR: 0.22 },
+  { id: "ch", kwhEUR: 0.28 },
+  { id: "eu", kwhEUR: 0.25 },
+  { id: "us", kwhEUR: 0.14 },
+];

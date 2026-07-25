@@ -1,11 +1,11 @@
 // Console sanity suite — calibration anchors from real-world estimates.
 // Browser: open ?test=1. Node: `node js/selftest.js` (module check at bottom).
 
-import { MODELS, HARDWARE, INDUSTRIES, CLOUD_PLANS } from "./data.js";
+import { MODELS, HARDWARE, INDUSTRIES, CLOUD_PLANS, COUNTRIES } from "./data.js";
 import {
   weightsGB, capacity, singleStreamTokS, maxUsefulStreams,
   usersServed, recommend, normalizeSovereignty, monthlyTokensPerSeat,
-  cloudComparison, hybridPlan,
+  cloudComparison, hybridPlan, selfHostMonthly, powerKWhPerMonth,
 } from "./calc.js";
 
 const model = (id) => MODELS.find((m) => m.id === id);
@@ -136,6 +136,19 @@ export function run() {
   check("Kanzlei preset sovereignty >= 80", kanzlei.sovereigntyPct >= 80);
   check("Kanzlei preset RAG-dominant",
     Object.entries(kanzlei.mix).sort((a, b) => b[1] - a[1])[0][0] === "rag");
+
+  // --- Power by country ---
+  const server4x = hw("server-4x-pro6000");
+  const kwhMo = powerKWhPerMonth(server4x);
+  check("4x server ~730 kWh/month at 40% util", kwhMo > 700 && kwhMo < 760, kwhMo.toFixed(0));
+  const de = COUNTRIES.find((c) => c.id === "de");
+  const us = COUNTRIES.find((c) => c.id === "us");
+  const shDe = selfHostMonthly(server4x, de.kwhEUR);
+  const shUs = selfHostMonthly(server4x, us.kwhEUR);
+  check("Energy cost scales with country rate",
+    Math.abs(shDe.energy / shUs.energy - de.kwhEUR / us.kwhEUR) < 0.01,
+    `de ${shDe.energy.toFixed(0)} vs us ${shUs.energy.toFixed(0)}`);
+  check("Hardware amortization country-independent", shDe.hardware === shUs.hardware);
 
   const failed = results.filter((r) => !r.pass);
   console.log(`\nSelf-test: ${results.length - failed.length}/${results.length} passed`);
