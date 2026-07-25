@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Server Calculator</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='3' y='3' width='10' height='10' rx='2' transform='rotate(45 8 8)' fill='%230e6e5c'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">ACME Server GmbH</span>
+    </div>
+    <button id="lang-toggle" class="lang-toggle" type="button" aria-label="Sprache wechseln / switch language">EN</button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1 data-i18n="app.title"></h1>
+      <p class="tagline" data-i18n="app.tagline"></p>
+    </section>
+
+    <nav class="mode-tabs" role="tablist">
+      <button id="tab-wizard" class="tab active" role="tab" aria-selected="true" data-i18n="tabs.wizard"></button>
+      <button id="tab-expert" class="tab" role="tab" aria-selected="false" data-i18n="tabs.expert"></button>
+    </nav>
+
+    <!-- ============ WIZARD ============ -->
+    <section id="wizard" class="panel">
+      <div class="progress" id="wizard-progress" aria-hidden="true"></div>
+
+      <form id="wizard-form">
+        <fieldset class="wizard-step" data-step="0">
+          <legend data-i18n="wizard.step.users.title"></legend>
+          <p class="step-desc" data-i18n="wizard.step.users.desc"></p>
+          <div class="radio-grid">
+            <label class="radio-card">
+              <input type="radio" name="users" value="3" checked>
+              <span class="rc-title" data-i18n="wizard.users.opt1"></span>
+              <span class="rc-desc" data-i18n="wizard.users.opt1.desc"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="users" value="15">
+              <span class="rc-title" data-i18n="wizard.users.opt2"></span>
+              <span class="rc-desc" data-i18n="wizard.users.opt2.desc"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="users" value="60">
+              <span class="rc-title" data-i18n="wizard.users.opt3"></span>
+              <span class="rc-desc" data-i18n="wizard.users.opt3.desc"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="users" value="250">
+              <span class="rc-title" data-i18n="wizard.users.opt4"></span>
+              <span class="rc-desc" data-i18n="wizard.users.opt4.desc"></span>
+            </label>
+          </div>
+          <label class="custom-users">
+            <span data-i18n="wizard.users.custom"></span>
+            <input type="number" name="usersCustom" min="1" max="5000" step="1" inputmode="numeric">
+          </label>
+        </fieldset>
+
+        <fieldset class="wizard-step" data-step="1" hidden>
+          <legend data-i18n="wizard.step.usecase.title"></legend>
+          <p class="step-desc" data-i18n="wizard.step.usecase.desc"></p>
+          <div class="radio-grid">
+            <label class="radio-card">
+              <input type="radio" name="useCase" value="chat" checked>
+              <span class="rc-title" data-i18n="usecase.chat"></span>
+              <span class="rc-desc" data-i18n="usecase.chat.desc"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="useCase" value="rag">
+              <span class="rc-title" data-i18n="usecase.rag"></span>
+              <span class="rc-desc" data-i18n="usecase.rag.desc"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="useCase" value="coding">
+              <span class="rc-title" data-i18n="usecase.coding"></span>
+              <span class="rc-desc" data-i18n="usecase.coding.desc"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="useCase" value="agentic">
+              <span class="rc-title" data-i18n="usecase.agentic"></span>
+              <span class="rc-desc" data-i18n="usecase.agentic.desc"></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="wizard-step" data-step="2" hidden>
+          <legend data-i18n="wizard.step.sov.title"></legend>
+          <p class="step-desc" data-i18n="wizard.step.sov.desc"></p>
+          <div class="radio-grid">
+            <label class="radio-card">
+              <input type="radio" name="sovereignty" value="hard">
+              <span class="rc-title" data-i18n="sov.hard"></span>
+              <span class="rc-desc" data-i18n="sov.hard.desc"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="sovereignty" value="preferred" checked>
+              <span class="rc-title" data-i18n="sov.pref"></span>
+              <span class="rc-desc" data-i18n="sov.pref.desc"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="sovereignty" value="none">
+              <span class="rc-title" data-i18n="sov.none"></span>
+              <span class="rc-desc" data-i18n="sov.none.desc"></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="wizard-step" data-step="3" hidden>
+          <legend data-i18n="wizard.step.budget.title"></legend>
+          <p class="step-desc" data-i18n="wizard.step.budget.desc"></p>
+          <div class="radio-grid">
+            <label class="radio-card">
+              <input type="radio" name="budgetId" value="b1">
+              <span class="rc-title" data-i18n="budget.b1"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="budgetId" value="b2" checked>
+              <span class="rc-title" data-i18n="budget.b2"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="budgetId" value="b3">
+              <span class="rc-title" data-i18n="budget.b3"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="budgetId" value="b4">
+              <span class="rc-title" data-i18n="budget.b4"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="budgetId" value="b5">
+              <span class="rc-title" data-i18n="budget.b5"></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="wizard-step" data-step="4" hidden>
+          <legend data-i18n="wizard.step.quality.title"></legend>
+          <p class="step-desc" data-i18n="wizard.step.quality.desc"></p>
+          <div class="radio-grid">
+            <label class="radio-card">
+              <input type="radio" name="quality" value="basic">
+              <span class="rc-title" data-i18n="quality.basic"></span>
+              <span class="rc-desc" data-i18n="quality.basic.desc"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="quality" value="good" checked>
+              <span class="rc-title" data-i18n="quality.good"></span>
+              <span class="rc-desc" data-i18n="quality.good.desc"></span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="quality" value="best">
+              <span class="rc-title" data-i18n="quality.best"></span>
+              <span class="rc-desc" data-i18n="quality.best.desc"></span>
+            </label>
+          </div>
+        </fieldset>
+      </form>
+
+      <div class="wizard-nav">
+        <button id="wizard-back" class="btn secondary" type="button" data-i18n="wizard.back" hidden></button>
+        <button id="wizard-next" class="btn primary" type="button" data-i18n="wizard.next"></button>
+      </div>
+    </section>
+
+    <!-- ============ WIZARD RESULTS ============ -->
+    <section id="wizard-results" class="panel" hidden></section>
+
+    <!-- ============ EXPERT MODE ============ -->
+    <section id="expert" class="panel" hidden>
+      <h2 data-i18n="expert.title"></h2>
+      <p class="step-desc" data-i18n="expert.desc"></p>
+      <div class="expert-grid">
+        <form id="expert-form" class="expert-form">
+          <label>
+            <span data-i18n="expert.model"></span>
+            <select name="model" id="expert-model"></select>
+          </label>
+          <label>
+            <span data-i18n="expert.quant"></span>
+            <select name="quant" id="expert-quant"></select>
+          </label>
+          <label>
+            <span data-i18n="expert.context"></span>
+            <input type="range" name="ctx" id="expert-ctx" min="0" max="5" step="1" value="1">
+            <output id="expert-ctx-value">8k</output>
+          </label>
+          <label>
+            <span data-i18n="expert.streams"></span>
+            <input type="number" name="streams" id="expert-streams" min="1" max="200" step="1" value="4" inputmode="numeric">
+          </label>
+        </form>
+        <div id="expert-output" class="expert-output"></div>
+      </div>
+    </section>
+
+    <!-- ============ SHARED FOOT BLOCKS ============ -->
+    <section class="panel disclaimer-block">
+      <p class="disclaimer" data-i18n="app.disclaimer"></p>
+    </section>
+
+    <section class="panel cta-card">
+      <h3 data-i18n="cta.title"></h3>
+      <p data-i18n="cta.body"></p>
+      <a class="btn primary" href="mailto:info@example.com" data-i18n="cta.button"></a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span class="brand-name">ACME Server GmbH</span>
+    <nav>
+      <a href="#" data-i18n="footer.imprint"></a>
+      <a href="#" data-i18n="footer.privacy"></a>
+    </nav>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
