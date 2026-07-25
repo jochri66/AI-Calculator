@@ -9,10 +9,10 @@
 </head>
 <body>
   <header class="site-header">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true"></span>
-      <span class="brand-name">ACME Server GmbH</span>
-    </div>
+    <a class="brand" href="https://www.instagram.com/jochri66" target="_blank" rel="noopener">
+      <span class="brand-mark" aria-hidden="true">J</span>
+      <span class="brand-name">@jochri66</span>
+    </a>
     <button id="lang-toggle" class="lang-toggle" type="button" aria-label="Sprache wechseln / switch language">EN</button>
   </header>
 
@@ -66,27 +66,39 @@
         <fieldset class="wizard-step" data-step="1" hidden>
           <legend data-i18n="wizard.step.usecase.title"></legend>
           <p class="step-desc" data-i18n="wizard.step.usecase.desc"></p>
-          <div class="radio-grid">
-            <label class="radio-card">
-              <input type="radio" name="useCase" value="chat" checked>
-              <span class="rc-title" data-i18n="usecase.chat"></span>
+          <div class="mix-sliders">
+            <div class="mix-row">
+              <div class="mix-head">
+                <span class="rc-title" data-i18n="usecase.chat"></span>
+                <output class="mix-value" data-mix-out="chat">60%</output>
+              </div>
+              <input type="range" name="mix-chat" data-mix="chat" min="0" max="100" step="5" value="60">
               <span class="rc-desc" data-i18n="usecase.chat.desc"></span>
-            </label>
-            <label class="radio-card">
-              <input type="radio" name="useCase" value="rag">
-              <span class="rc-title" data-i18n="usecase.rag"></span>
+            </div>
+            <div class="mix-row">
+              <div class="mix-head">
+                <span class="rc-title" data-i18n="usecase.rag"></span>
+                <output class="mix-value" data-mix-out="rag">30%</output>
+              </div>
+              <input type="range" name="mix-rag" data-mix="rag" min="0" max="100" step="5" value="30">
               <span class="rc-desc" data-i18n="usecase.rag.desc"></span>
-            </label>
-            <label class="radio-card">
-              <input type="radio" name="useCase" value="coding">
-              <span class="rc-title" data-i18n="usecase.coding"></span>
+            </div>
+            <div class="mix-row">
+              <div class="mix-head">
+                <span class="rc-title" data-i18n="usecase.coding"></span>
+                <output class="mix-value" data-mix-out="coding">10%</output>
+              </div>
+              <input type="range" name="mix-coding" data-mix="coding" min="0" max="100" step="5" value="10">
               <span class="rc-desc" data-i18n="usecase.coding.desc"></span>
-            </label>
-            <label class="radio-card">
-              <input type="radio" name="useCase" value="agentic">
-              <span class="rc-title" data-i18n="usecase.agentic"></span>
+            </div>
+            <div class="mix-row">
+              <div class="mix-head">
+                <span class="rc-title" data-i18n="usecase.agentic"></span>
+                <output class="mix-value" data-mix-out="agentic">0%</output>
+              </div>
+              <input type="range" name="mix-agentic" data-mix="agentic" min="0" max="100" step="5" value="0">
               <span class="rc-desc" data-i18n="usecase.agentic.desc"></span>
-            </label>
+            </div>
           </div>
         </fieldset>
 
@@ -207,12 +219,18 @@
     <section class="panel cta-card">
       <h3 data-i18n="cta.title"></h3>
       <p data-i18n="cta.body"></p>
-      <a class="btn primary" href="mailto:info@example.com" data-i18n="cta.button"></a>
+      <div class="cta-links">
+        <a class="btn primary" href="https://www.instagram.com/jochri66" target="_blank" rel="noopener" data-i18n="cta.button"></a>
+        <a class="btn secondary" href="https://www.instagram.com/ai.career.coach" target="_blank" rel="noopener">@ai.career.coach</a>
+      </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <span class="brand-name">ACME Server GmbH</span>
+    <span>made by
+      <a href="https://www.instagram.com/jochri66" target="_blank" rel="noopener">@jochri66</a> ·
+      <a href="https://www.instagram.com/ai.career.coach" target="_blank" rel="noopener">@ai.career.coach</a>
+    </span>
     <nav>
       <a href="#" data-i18n="footer.imprint"></a>
       <a href="#" data-i18n="footer.privacy"></a>

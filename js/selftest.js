@@ -80,6 +80,15 @@ export function run() {
   check("Frontier reachable with hard+b5+best", rec3All.some((p) => p.model.tier === "frontier-moe"),
     rec3All.map((p) => `${p.model.name}@${p.hw.name}`).join(" | "));
 
+  // --- Mixed workload: 40 users at 50% chat / 50% agents ---
+  // streams = 40*(0.5/8 + 0.5/1) = 22.5 -> 23; agents dominate the floor (30 tok/s)
+  const rec4 = recommend({
+    users: 40, mix: { chat: 50, rag: 0, coding: 0, agentic: 50 },
+    sovereignty: "preferred", budgetId: "b5", quality: "good",
+  });
+  check("Mixed 50/50 chat+agents -> 23 streams", rec4.needStreams === 23, String(rec4.needStreams));
+  check("Mixed dominant use case resolves", ["chat", "agentic"].includes(rec4.useCase), rec4.useCase);
+
   const failed = results.filter((r) => !r.pass);
   console.log(`\nSelf-test: ${results.length - failed.length}/${results.length} passed`);
   return failed.length === 0;

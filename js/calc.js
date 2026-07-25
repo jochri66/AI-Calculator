@@ -134,29 +134,60 @@ export function usersServed(streams, useCase) {
   return streams * USE_CASES[useCase].usersPerStream;
 }
 
+// ---- mixed workloads (use-case sliders) ----
+
+export function normalizeMix(mix) {
+  const keys = Object.keys(USE_CASES);
+  let total = keys.reduce((s, k) => s + (Number(mix?.[k]) || 0), 0);
+  if (total <= 0) return { chat: 1, rag: 0, coding: 0, agentic: 0 };
+  const out = {};
+  keys.forEach((k) => (out[k] = (Number(mix?.[k]) || 0) / total));
+  return out;
+}
+
+// Blend a normalized mix into effective planning parameters:
+// - effUsersPerStream: harmonic blend (each share consumes streams at its own rate)
+// - minTokS: strictest floor among meaningfully-used cases (>5% share)
+// - ctx: largest default context among meaningfully-used cases (conservative KV sizing)
+// - dominant: highest-share use case (drives model fit + labels)
+export function blendUseCases(mix) {
+  const active = Object.entries(mix).filter(([, share]) => share > 0.05);
+  const inverseSum = Object.entries(mix).reduce(
+    (s, [k, share]) => s + share / USE_CASES[k].usersPerStream, 0
+  );
+  return {
+    mix,
+    effUsersPerStream: 1 / inverseSum,
+    minTokS: Math.max(...active.map(([k]) => USE_CASES[k].minTokS)),
+    ctx: Math.max(...active.map(([k]) => USE_CASES[k].defaultCtx)),
+    dominant: Object.entries(mix).sort((a, b) => b[1] - a[1])[0][0],
+  };
+}
+
 function tiersForQuality(quality, budgetIdx) {
   if (quality === "basic") return ["small", "mid"];
   if (quality === "good") return budgetIdx >= 2 ? ["mid", "large-moe"] : ["mid"];
   return ["mid", "large-moe"]; // "best"; frontier added separately when eligible
 }
 
-function buildOption(pair, useCase, ctx) {
-  const uc = USE_CASES[useCase];
-  const maxStreams = maxUsefulStreams(pair.model, pair.quant, ctx, pair.hw, uc.minTokS);
+function buildOption(pair, blend) {
+  const maxStreams = maxUsefulStreams(pair.model, pair.quant, blend.ctx, pair.hw, blend.minTokS);
   return {
     ...pair,
     maxUsefulStreams: maxStreams,
-    maxUsers: usersServed(maxStreams, useCase),
+    maxUsers: Math.floor(maxStreams * blend.effUsersPerStream),
   };
 }
 
 // Wizard recommendation.
-// answers: { users, useCase, sovereignty: "hard"|"preferred"|"none",
+// answers: { users, mix: {chat,rag,coding,agentic}, sovereignty: "hard"|"preferred"|"none",
 //            budgetId: "b1".."b5", quality: "basic"|"good"|"best" }
+// (answers.useCase is accepted as shorthand for a 100% single-use-case mix.)
 export function recommend(answers) {
-  const uc = USE_CASES[answers.useCase];
-  const ctx = uc.defaultCtx;
-  const needStreams = streamsNeeded(answers.users, answers.useCase);
+  const mix = normalizeMix(answers.mix || (answers.useCase ? { [answers.useCase]: 1 } : null));
+  const blend = blendUseCases(mix);
+  const ctx = blend.ctx;
+  const needStreams = Math.max(1, Math.ceil(answers.users / blend.effUsersPerStream));
   const budgetIdx = BUDGET_RANGES.findIndex((b) => b.id === answers.budgetId);
   const budgetMax = BUDGET_RANGES[budgetIdx].max;
 
@@ -169,7 +200,7 @@ export function recommend(answers) {
   if (frontierOK) tiers.push("frontier-moe");
 
   const models = MODELS.filter(
-    (m) => tiers.includes(m.tier) && m.useCaseFit[answers.useCase] >= 2
+    (m) => tiers.includes(m.tier) && m.useCaseFit[blend.dominant] >= 2
   );
   const quants = answers.quality === "best" ? ["q8", "q4"] : ["q4"];
 
@@ -180,7 +211,7 @@ export function recommend(answers) {
       for (const hw of HARDWARE) {
         const cap = capacity(model, quant, ctx, hw, needStreams);
         if (!cap.fits) continue;
-        if (cap.perStream < uc.minTokS) continue;
+        if (cap.perStream < blend.minTokS) continue;
         if (cap.streams < needStreams) continue;
         pairs.push({
           model, quant, hw, cap,
@@ -241,7 +272,7 @@ export function recommend(answers) {
       TIER_RANK[a.model.tier] - TIER_RANK[b.model.tier];
     for (const model of models) {
       for (const hw of HARDWARE) {
-        const opt = buildOption({ model, quant: "q4", hw, cap: null, price: hw.priceEUR[0], inBudget: hw.priceEUR[0] <= budgetMax }, answers.useCase, ctx);
+        const opt = buildOption({ model, quant: "q4", hw, cap: null, price: hw.priceEUR[0], inBudget: hw.priceEUR[0] <= budgetMax }, blend);
         if (opt.maxUsefulStreams > 0 && (!best || better(opt, best) > 0)) best = opt;
       }
     }
@@ -264,12 +295,13 @@ export function recommend(answers) {
   if (budgetMiss) caveats.add("caveat.budgetMiss");
   if (capacityShort) caveats.add("caveat.capacityShort");
 
-  const decorate = (p) => (p ? buildOption(p, answers.useCase, ctx) : null);
+  const decorate = (p) => (p ? buildOption(p, blend) : null);
 
   return {
     needStreams,
     ctx,
-    useCase: answers.useCase,
+    useCase: blend.dominant,
+    mix,
     users: answers.users,
     budgetMiss,
     capacityShort,

@@ -35,13 +35,32 @@ function collectAnswers() {
   const form = $("wizard-form");
   const fd = new FormData(form);
   const custom = Number(fd.get("usersCustom"));
+  const mix = {};
+  document.querySelectorAll("[data-mix]").forEach((el) => {
+    mix[el.dataset.mix] = Number(el.value) || 0;
+  });
   return {
     users: custom > 0 ? custom : Number(fd.get("users")),
-    useCase: fd.get("useCase"),
+    mix,
     sovereignty: fd.get("sovereignty"),
     budgetId: fd.get("budgetId"),
     quality: fd.get("quality"),
   };
+}
+
+// Live slider feedback: normalized share labels + gradient track fill.
+function initMixSliders() {
+  const sliders = [...document.querySelectorAll("[data-mix]")];
+  const update = () => {
+    const total = sliders.reduce((s, el) => s + Number(el.value), 0);
+    sliders.forEach((el) => {
+      el.style.setProperty("--pct", `${el.value}%`);
+      const share = total > 0 ? Math.round((Number(el.value) / total) * 100) : 0;
+      document.querySelector(`[data-mix-out="${el.dataset.mix}"]`).textContent = `${share}%`;
+    });
+  };
+  sliders.forEach((el) => el.addEventListener("input", update));
+  update();
 }
 
 function showResults() {
@@ -80,6 +99,7 @@ function init() {
   applyTranslations();
   updateLangToggle();
   showStep(0);
+  initMixSliders();
   expertApi = initExpert();
 
   $("lang-toggle").addEventListener("click", () => {

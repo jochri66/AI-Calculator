@@ -1,22 +1,22 @@
 // Minimal i18n: flat key-value dicts, data-i18n attributes for static text,
-// t(key, params) for dynamic text. German is the default.
+// t(key, params) for dynamic text. German is the default (informal "du").
 
 export const STRINGS = {
   de: {
-    "app.title": "Wie viel Server braucht Ihre lokale KI?",
+    "app.title": "Wie viel Server braucht deine lokale KI?",
     "app.tagline":
-      "Planen Sie realistisch, welche Hardware Sie brauchen, um Sprachmodelle im eigenen Haus zu betreiben — mit ehrlichen Zahlen statt Marketing-Versprechen.",
+      "Finde raus, welche Hardware du wirklich brauchst, um KI-Modelle bei dir laufen zu lassen — ehrliche Zahlen statt Marketing-Versprechen.",
     "app.disclaimer":
       "Alle Werte sind Planungsschätzungen auf Basis von Speicherbandbreite, Kapazität und Batching-Heuristiken — keine Benchmarks. Reale Ergebnisse hängen von Software-Stack, Kontextlängen und Lastprofil ab (±30 % sind normal).",
 
-    "tabs.wizard": "Bedarfs-Assistent",
+    "tabs.wizard": "Bedarfs-Check",
     "tabs.expert": "Experten-Modus",
 
-    "wizard.step.users.title": "Wie viele Personen sollen die KI gleichzeitig nutzen?",
+    "wizard.step.users.title": "Wie viele Leute nutzen die KI gleichzeitig?",
     "wizard.step.users.desc":
-      "Gemeint sind aktive Nutzer zur gleichen Zeit, nicht die Gesamtzahl der Mitarbeitenden.",
+      "Gemeint sind aktive Nutzer zur gleichen Zeit, nicht dein gesamtes Team.",
     "wizard.users.opt1": "1–5",
-    "wizard.users.opt1.desc": "Einzelperson oder kleines Team",
+    "wizard.users.opt1.desc": "Solo oder kleines Team",
     "wizard.users.opt2": "5–25",
     "wizard.users.opt2.desc": "Abteilung",
     "wizard.users.opt3": "25–100",
@@ -27,26 +27,26 @@ export const STRINGS = {
 
     "wizard.step.usecase.title": "Wofür soll die KI hauptsächlich eingesetzt werden?",
     "wizard.step.usecase.desc":
-      "Der Anwendungsfall bestimmt, wie viele Nutzer sich einen Rechenstrom teilen können.",
+      "Verteil die Nutzung mit den Reglern — Mischbetrieb ist völlig normal. Der Mix bestimmt, wie viele Leute sich einen Rechenstrom teilen können.",
     "usecase.chat": "Chat-Assistent",
     "usecase.chat.desc": "Fragen & Antworten, Texte, E-Mails — Nutzer sind meist im Leerlauf",
     "usecase.rag": "Wissensdatenbank (RAG)",
     "usecase.rag.desc": "Fragen an eigene Dokumente mit Quellenangaben",
-    "usecase.coding": "Programmier-Assistent",
+    "usecase.coding": "Coding-Assistent",
     "usecase.coding.desc": "Code-Vervollständigung und -Erklärung, braucht mehr Tempo",
     "usecase.agentic": "KI-Agenten",
     "usecase.agentic.desc":
-      "Autonome Arbeitsabläufe — Agenten belegen ihren Rechenstrom dauerhaft (1:1!)",
+      "Autonome Workflows — Agenten belegen ihren Rechenstrom dauerhaft (1:1!)",
 
-    "wizard.step.sov.title": "Wie wichtig ist Datensouveränität?",
+    "wizard.step.sov.title": "Wie wichtig ist dir Datensouveränität?",
     "wizard.step.sov.desc":
-      "Ehrliche Antwort: Ohne harte Anforderungen ist eine Cloud-API oft die wirtschaftlichere Wahl.",
+      "Ehrlich gesagt: Ohne harte Anforderungen ist eine Cloud-API oft die wirtschaftlichere Wahl.",
     "sov.hard": "Harte Anforderung",
     "sov.hard.desc": "Daten dürfen das Haus nicht verlassen (Regulierung, Verträge, Geheimschutz)",
     "sov.pref": "Bevorzugt lokal",
     "sov.pref.desc": "Lokal ist uns lieber, aber kein Muss",
     "sov.none": "Flexibel",
-    "sov.none.desc": "Cloud wäre auch in Ordnung",
+    "sov.none.desc": "Cloud wäre auch okay",
 
     "wizard.step.budget.title": "Welcher Budgetrahmen ist realistisch?",
     "wizard.step.budget.desc": "Einmalige Hardware-Investition (netto), ohne Betriebskosten.",
@@ -56,7 +56,7 @@ export const STRINGS = {
     "budget.b4": "bis 150.000 €",
     "budget.b5": "über 150.000 €",
 
-    "wizard.step.quality.title": "Welche Antwortqualität brauchen Sie?",
+    "wizard.step.quality.title": "Welche Antwortqualität brauchst du?",
     "wizard.step.quality.desc":
       "Größere Modelle antworten klüger, brauchen aber überproportional mehr Hardware.",
     "quality.basic": "Solide Basis",
@@ -71,7 +71,7 @@ export const STRINGS = {
     "wizard.show": "Empfehlung berechnen",
     "wizard.restart": "Neu starten",
 
-    "results.title": "Ihre Empfehlung",
+    "results.title": "Deine Empfehlung",
     "results.badge.primary": "Empfehlung",
     "results.badge.primaryOver": "Günstigste machbare Lösung (über Budget)",
     "results.badge.alt": "Sparsame Alternative",
@@ -83,31 +83,33 @@ export const STRINGS = {
     "results.streams": "Parallele Sitzungen",
     "results.maxUsers": "Versorgt bis zu",
     "results.usersUnit": "{n} Nutzer",
-    "results.needLine": "Ihr Bedarf: ca. {users} gleichzeitige Nutzer ≈ {streams} parallele Rechenströme.",
+    "results.needLine": "Dein Bedarf: ca. {users} gleichzeitige Nutzer ≈ {streams} parallele Rechenströme.",
     "results.tokS": "{a}–{b} Tok./s",
     "results.memory": "Speicherbedarf",
     "results.ofMem": "{used} von {avail} GB",
+    "results.share": "Ergebnis teilen",
+    "results.shareCopied": "Kopiert!",
     "results.budgetMiss":
-      "Im gewählten Budget gibt es keine Konfiguration, die Ihren Bedarf erfüllt. Unten sehen Sie die günstigste machbare Lösung — oder wählen Sie eine Stufe kleiner bei der Modellqualität.",
+      "In deinem Budget gibt es keine Konfiguration, die den Bedarf erfüllt. Unten siehst du die günstigste machbare Lösung — oder geh bei der Modellqualität eine Stufe runter.",
     "results.capacityShort":
       "Kein einzelnes System im Katalog deckt diesen Bedarf voll ab. Gezeigt wird die Option mit der höchsten Kapazität — für mehr braucht es ein individuell geplantes Cluster.",
     "results.caveatsTitle": "Wichtige Hinweise — bitte lesen",
     "results.none":
-      "Für diese Kombination gibt es keine sinnvolle Empfehlung. Versuchen Sie andere Angaben.",
+      "Für diese Kombination gibt es keine sinnvolle Empfehlung. Probier andere Angaben.",
 
     "caveat.moePcie":
       "MoE-Modelle über reine PCIe-Verbindungen (ohne NVLink) sind für diese Modellklasse noch nicht belastbar gebenchmarkt — das Expert-Routing kann die Praxis-Leistung spürbar drücken. Der Hersteller empfiehlt für Kimi K3 64+ Beschleuniger.",
     "caveat.clusterFinicky":
       "Mac-Cluster über Thunderbolt funktionieren, sind aber fummelig im Betrieb und halbieren grob die Einzelstrom-Leistung.",
     "caveat.cpuSlow":
-      "CPU-Server passen zwar vom Speicher her, liefern aber nur wenige Token pro Sekunde — geeignet zum Ausprobieren, nicht für den Team-Einsatz.",
+      "CPU-Server passen zwar vom Speicher her, liefern aber nur wenige Token pro Sekunde — gut zum Ausprobieren, nicht für den Team-Einsatz.",
     "caveat.benchmarkPending":
       "Kimi K3: Gewichte erscheinen erst am 27. Juli; belastbare Benchmarks folgen ca. 2–4 Wochen später. Vor einer Kaufentscheidung unbedingt echte Messwerte abwarten.",
     "caveat.apiCheaper":
-      "Ohne harte Datensouveränitäts-Anforderung ist eine Cloud-API für die meisten Firmen deutlich günstiger als eigene Hardware. Rechnen Sie beides durch, bevor Sie investieren.",
+      "Ohne harte Datensouveränitäts-Anforderung ist eine Cloud-API für die meisten Firmen deutlich günstiger als eigene Hardware. Rechne beides durch, bevor du investierst.",
     "caveat.midsizeCompare":
       "Zum Vergleich: Ein Setup der 70B–235B-Klasse (~60.000 €) erledigt dieselben Aufgaben für die meisten Mittelständler — Frontier-Modelle lohnen sich nur bei harten Anforderungen und Premium-Budget.",
-    "caveat.budgetMiss": "Die gezeigte Lösung liegt über Ihrem angegebenen Budget.",
+    "caveat.budgetMiss": "Die gezeigte Lösung liegt über deinem angegebenen Budget.",
     "caveat.capacityShort": "Der gezeigte Bedarf übersteigt die Kapazität von Standard-Systemen.",
 
     "model.note.k3":
@@ -149,10 +151,10 @@ export const STRINGS = {
     "tier.large-moe": "Großes MoE-Modell",
     "tier.frontier-moe": "Frontier-Modell",
 
-    "cta.title": "Fragen zur Umsetzung?",
+    "cta.title": "Bock, das umzusetzen?",
     "cta.body":
-      "Wir planen und bauen solche Systeme — vom Workstation-Einstieg bis zum redundanten Cluster. Gern rechnen wir Ihr Szenario unverbindlich durch.",
-    "cta.button": "Unverbindlich anfragen",
+      "Wir planen und bauen solche Systeme — vom Workstation-Einstieg bis zum redundanten Cluster. Schreib uns auf Instagram, wir rechnen dein Szenario unverbindlich durch.",
+    "cta.button": "Schreib @jochri66",
 
     "footer.imprint": "Impressum",
     "footer.privacy": "Datenschutz",
@@ -162,18 +164,18 @@ export const STRINGS = {
   en: {
     "app.title": "How much server does your local AI need?",
     "app.tagline":
-      "Get a realistic estimate of the hardware you need to run language models on-premises — honest numbers instead of marketing promises.",
+      "Find out what hardware you actually need to run AI models on your own turf — honest numbers instead of marketing promises.",
     "app.disclaimer":
       "All figures are planning estimates based on memory bandwidth, capacity and batching heuristics — not benchmarks. Real-world results depend on software stack, context lengths and load profile (±30% is normal).",
 
-    "tabs.wizard": "Needs wizard",
+    "tabs.wizard": "Needs check",
     "tabs.expert": "Expert mode",
 
     "wizard.step.users.title": "How many people will use the AI at the same time?",
     "wizard.step.users.desc":
       "This means concurrently active users, not your total headcount.",
     "wizard.users.opt1": "1–5",
-    "wizard.users.opt1.desc": "Individual or small team",
+    "wizard.users.opt1.desc": "Solo or small team",
     "wizard.users.opt2": "5–25",
     "wizard.users.opt2.desc": "Department",
     "wizard.users.opt3": "25–100",
@@ -184,7 +186,7 @@ export const STRINGS = {
 
     "wizard.step.usecase.title": "What will the AI mainly be used for?",
     "wizard.step.usecase.desc":
-      "The use case determines how many users can share one compute stream.",
+      "Spread the usage with the sliders — mixed workloads are totally normal. The mix determines how many people can share one compute stream.",
     "usecase.chat": "Chat assistant",
     "usecase.chat.desc": "Q&A, drafting, e-mails — users are idle most of the time",
     "usecase.rag": "Knowledge base (RAG)",
@@ -195,9 +197,9 @@ export const STRINGS = {
     "usecase.agentic.desc":
       "Autonomous workflows — agents hold their stream continuously (1:1!)",
 
-    "wizard.step.sov.title": "How important is data sovereignty?",
+    "wizard.step.sov.title": "How important is data sovereignty to you?",
     "wizard.step.sov.desc":
-      "Honest answer: without hard requirements, a cloud API is often the more economical choice.",
+      "Honestly: without hard requirements, a cloud API is often the more economical choice.",
     "sov.hard": "Hard requirement",
     "sov.hard.desc": "Data must not leave the premises (regulation, contracts, confidentiality)",
     "sov.pref": "Prefer local",
@@ -244,8 +246,10 @@ export const STRINGS = {
     "results.tokS": "{a}–{b} tok/s",
     "results.memory": "Memory footprint",
     "results.ofMem": "{used} of {avail} GB",
+    "results.share": "Share result",
+    "results.shareCopied": "Copied!",
     "results.budgetMiss":
-      "No configuration within your chosen budget meets this need. Below is the cheapest viable option — or step down one model-quality tier.",
+      "No configuration within your budget meets this need. Below is the cheapest viable option — or step down one model-quality tier.",
     "results.capacityShort":
       "No single catalog system fully covers this demand. Shown is the highest-capacity option — beyond that you need an individually planned cluster.",
     "results.caveatsTitle": "Important caveats — please read",
@@ -306,10 +310,10 @@ export const STRINGS = {
     "tier.large-moe": "Large MoE model",
     "tier.frontier-moe": "Frontier model",
 
-    "cta.title": "Planning to build this?",
+    "cta.title": "Ready to build this?",
     "cta.body":
-      "We design and build systems like these — from workstation entry points to redundant clusters. Happy to run your scenario, no strings attached.",
-    "cta.button": "Get in touch",
+      "We design and build systems like these — from workstation entry points to redundant clusters. DM us on Instagram and we'll run your scenario, no strings attached.",
+    "cta.button": "DM @jochri66",
 
     "footer.imprint": "Imprint",
     "footer.privacy": "Privacy",

@@ -84,8 +84,35 @@ export function renderWizardResults(container, answers) {
     ${missNote}
     ${cards}
     ${caveats}
-    ${restartButton()}`;
+    ${controlsRow()}`;
   wireRestart(container);
+  wireShare(container, rec);
+}
+
+function controlsRow() {
+  return `<div class="wizard-nav results-controls">
+    <button class="btn secondary" data-action="restart">${esc(t("wizard.restart"))}</button>
+    <button class="btn primary" data-action="share">${esc(t("results.share"))}</button>
+  </div>`;
+}
+
+function wireShare(container, rec) {
+  const btn = container.querySelector('[data-action="share"]');
+  if (!btn || !rec.primary) return;
+  btn.addEventListener("click", async () => {
+    const p = rec.primary;
+    const text = `${p.model.name} + ${p.hw.name} (${priceRange(p.hw)}) — ${t("app.title")}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: t("app.title"), text, url: location.href });
+      } else {
+        await navigator.clipboard.writeText(`${text}\n${location.href}`);
+        const old = btn.textContent;
+        btn.textContent = t("results.shareCopied");
+        setTimeout(() => { btn.textContent = old; }, 1600);
+      }
+    } catch (_) { /* user cancelled */ }
+  });
 }
 
 function resultCard(opt, badge, kind) {
@@ -117,6 +144,7 @@ function resultCard(opt, badge, kind) {
 function restartButton() {
   return `<div class="wizard-nav"><button class="btn secondary" data-action="restart">${esc(t("wizard.restart"))}</button></div>`;
 }
+
 
 function wireRestart(container) {
   container.querySelector('[data-action="restart"]')?.addEventListener("click", () => {
@@ -204,9 +232,9 @@ function renderExpertOutput(container, model, quant, ctx, streams) {
       <div class="seg-overhead" style="width:${pct(oh)}%"></div>
     </div>
     <div class="mem-legend">
-      <span><span class="swatch" style="background:var(--accent)"></span>${esc(t("expert.weights"))}: ${fmtNum(w, 0)} GB</span>
-      <span><span class="swatch" style="background:#4aa38f"></span>${esc(t("expert.kv", { n: fmtNum(streams) }))}: ${fmtNum(kv, 1)} GB</span>
-      <span><span class="swatch" style="background:#b9d6cf"></span>${esc(t("expert.overhead"))}: ${fmtNum(oh, 0)} GB</span>
+      <span><span class="swatch" style="background:var(--seg-weights)"></span>${esc(t("expert.weights"))}: ${fmtNum(w, 0)} GB</span>
+      <span><span class="swatch" style="background:var(--seg-kv)"></span>${esc(t("expert.kv", { n: fmtNum(streams) }))}: ${fmtNum(kv, 1)} GB</span>
+      <span><span class="swatch" style="background:var(--seg-overhead)"></span>${esc(t("expert.overhead"))}: ${fmtNum(oh, 0)} GB</span>
       <span><strong>${esc(t("expert.total"))}: ${fmtNum(total, 0)} GB</strong></span>
     </div>
     ${model.moe
