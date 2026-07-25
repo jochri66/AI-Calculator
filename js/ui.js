@@ -5,7 +5,7 @@ import { MODELS, HARDWARE, QUANTS, USE_CASES, PRICING_ASOF, COUNTRIES } from "./
 import {
   weightsGB, kvGBPerStream, overheadGB, usableMemGB, activeGBPerToken,
   capacity, recommend, cloudComparison, hybridPlan, seatsFromConcurrent,
-  powerKWhPerMonth, redundancyEnergyFactor,
+  powerKWhPerMonth, redundancyEnergyFactor, cloudVerdict,
 } from "./calc.js";
 import { t, fmtEUR, fmtNum } from "./i18n.js";
 
@@ -184,16 +184,18 @@ function renderCloudSummary(container, opts) {
 
   let verdict = "";
   if (self) {
-    const cloudBest = Math.min(cheapSub.monthly, cheapApi.monthly);
-    const saving = cloudBest - self.energy;
-    if (saving > 0) {
-      const months = Math.ceil(((opts.hw.priceEUR[0] + opts.hw.priceEUR[1]) / 2) / saving);
-      verdict = months <= 36
-        ? t("cmpsum.breakeven", { n: fmtNum(months) })
+    const v = cloudVerdict({
+      priceAvg: (opts.hw.priceEUR[0] + opts.hw.priceEUR[1]) / 2,
+      energyMonthly: self.energy,
+      subMonthly: cheapSub.monthly,
+      apiMonthly: cheapApi.monthly,
+      agentsHeavy: cmp.agentsHeavy,
+    });
+    verdict = v.kind === "beatsAll"
+      ? t("cmpsum.breakeven", { n: fmtNum(v.months) })
+      : v.kind === "beatsSubs"
+        ? t("cmpsum.breakevenSubs", { n: fmtNum(v.months) })
         : t("cmpsum.cloudWins");
-    } else {
-      verdict = t("cmpsum.cloudWins");
-    }
   }
 
   container.innerHTML = `

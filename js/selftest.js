@@ -6,7 +6,7 @@ import {
   weightsGB, capacity, singleStreamTokS, maxUsefulStreams,
   usersServed, recommend, normalizeSovereignty, monthlyTokensPerSeat,
   cloudComparison, hybridPlan, selfHostMonthly, selfHostHorizons, powerKWhPerMonth,
-  redundancyEnergyFactor, rebalanceMix,
+  redundancyEnergyFactor, rebalanceMix, cloudVerdict,
 } from "./calc.js";
 
 const model = (id) => MODELS.find((m) => m.id === id);
@@ -249,6 +249,20 @@ export function run() {
   check("Shortfall includes H200 node and 3-node cluster",
     shortIds.includes("node-8x-h200") && shortIds.includes("cluster-3node"),
     shortIds.join(" + "));
+
+  // --- Cloud-vs-hardware verdict: subs and API judged separately ---
+  // User-reported case: hardware beats every sub in ~8 months, only the API
+  // is cheaper -> must NOT claim "cloud is cheaper" wholesale.
+  const v1 = cloudVerdict({ priceAvg: 6325, energyMonthly: 66, subMonthly: 945, apiMonthly: 131 });
+  check("Verdict: beats subs only", v1.kind === "beatsSubs" && v1.months === 8, `${v1.kind} ${v1.months}`);
+  const v2 = cloudVerdict({ priceAvg: 6325, energyMonthly: 66, subMonthly: 945, apiMonthly: 500 });
+  check("Verdict: beats all within 36mo", v2.kind === "beatsAll" && v2.months <= 36, `${v2.kind} ${v2.months}`);
+  const v3 = cloudVerdict({ priceAvg: 6325, energyMonthly: 66, subMonthly: 70, apiMonthly: 60 });
+  check("Verdict: cloud wins when all cheap", v3.kind === "cloudWins");
+  const v4 = cloudVerdict({ priceAvg: 6000, energyMonthly: 200, subMonthly: 150, apiMonthly: 100 });
+  check("Verdict: sub below energy -> cloud wins (no blowup)", v4.kind === "cloudWins");
+  const v5 = cloudVerdict({ priceAvg: 72000, energyMonthly: 219, subMonthly: 630, apiMonthly: 942, agentsHeavy: true });
+  check("Verdict: agentsHeavy ignores capped subs", v5.kind !== "beatsSubs", v5.kind);
 
   // --- Mix slider auto-balance: equal spread, clamping, un-stuck zeros ---
   const sum = (a) => a.reduce((s, n) => s + n, 0);

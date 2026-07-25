@@ -259,6 +259,8 @@ export const STRINGS = {
     "cmpsum.api": "Günstigste Cloud-API",
     "cmpsum.breakeven":
       "Kurz gesagt: Nach ca. {n} Monaten hat sich deine eigene Hardware bezahlt gemacht — danach zahlst du nur noch Strom.",
+    "cmpsum.breakevenSubs":
+      "Kurz gesagt: Eigene Hardware schlägt jedes Cloud-Abo nach ca. {n} Monaten. Nur reine API-Nutzung wäre bei deinem Volumen günstiger — realistisch, wenn dein Team ohne Abo-Oberfläche und -Komfort auskommt.",
     "cmpsum.cloudWins":
       "Kurz gesagt: Bei deiner Nutzung bleibt die Cloud rechnerisch günstiger. Eigene Hardware lohnt sich hier vor allem, wenn deine Daten das Haus nicht verlassen dürfen.",
     "cmpsum.details": "Alle Anbieter im Detail vergleichen",
@@ -548,6 +550,8 @@ export const STRINGS = {
     "cmpsum.api": "Cheapest cloud API",
     "cmpsum.breakeven":
       "In short: after about {n} months your own hardware has paid for itself — from then on you only pay for power.",
+    "cmpsum.breakevenSubs":
+      "In short: your own hardware beats every cloud subscription after about {n} months. Only pure API usage would be cheaper at your volume — realistic if your team can do without the subscription UI and comfort.",
     "cmpsum.cloudWins":
       "In short: at your usage level the cloud stays cheaper on paper. Own hardware pays off here mainly when your data must not leave the premises.",
     "cmpsum.details": "Compare all providers in detail",

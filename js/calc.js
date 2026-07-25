@@ -364,6 +364,26 @@ export function powerKWhPerMonth(hw) {
   return (hw.powerW * UTILIZATION * 24 * 365) / 12 / 1000;
 }
 
+// Verdict for the results summary: does own hardware pay off within 36 months
+// against subscriptions and/or API usage? Financing-independent (avg hardware
+// price vs energy-only running cost). Comparing only against min(sub, api)
+// was misleading: a cheap API made the text claim "cloud is cheaper" even
+// when hardware beat every subscription within months. With agentsHeavy
+// (capped seat plans can't sustain agent token volumes) subscriptions are
+// unrealistic, so only the API counts as the cloud reference.
+export function cloudVerdict({ priceAvg, energyMonthly, subMonthly, apiMonthly, agentsHeavy = false }) {
+  const months = (m) => (m - energyMonthly > 0 ? Math.ceil(priceAvg / (m - energyMonthly)) : Infinity);
+  if (agentsHeavy) {
+    const vsApi = months(apiMonthly);
+    return vsApi <= 36 ? { kind: "beatsAll", months: vsApi } : { kind: "cloudWins", months: null };
+  }
+  const vsAll = months(Math.min(subMonthly, apiMonthly));
+  const vsSub = months(subMonthly);
+  if (vsAll <= 36) return { kind: "beatsAll", months: vsAll };
+  if (vsSub <= 36) return { kind: "beatsSubs", months: vsSub };
+  return { kind: "cloudWins", months: null };
+}
+
 // Auto-balance for the usage-mix sliders: when one slider moves, spread the
 // difference EQUALLY over the others so every slider visibly reacts (a
 // proportional split lets big sliders swallow the whole delta and freezes
