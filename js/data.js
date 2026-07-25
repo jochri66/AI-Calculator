@@ -198,7 +198,7 @@ export const HARDWARE = [
     id: "node-8x-h200", category: "gpu-node", name: "GPU server, 8x NVIDIA H200 SXM (1.1 TB HBM3e)",
     priceEUR: [330000, 380000], memGB: 1128, memType: "vram",
     bandwidthGBs: 3200, bandwidthEfficiency: 0.65,
-    maxBatchBoost: 16, maxStreams: 24, interconnect: "fabric",
+    maxBatchBoost: 16, maxStreams: 32, interconnect: "fabric",
     priceCheck: "NVIDIA H200", instances: 1, redundant: false,
     noteKeys: ["hw.note.production", "hw.note.enterprise"],
   },

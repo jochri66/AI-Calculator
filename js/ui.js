@@ -119,7 +119,7 @@ export function renderWizardResults(container, answers) {
     resultCard(rec.primary, primaryBadge, "primary"),
     redundancyCard(rec, answers),
     rec.alternative
-      ? resultCard(rec.alternative, `<span class="result-badge">${esc(t("results.badge.alt"))}</span>`, "secondary")
+      ? resultCard(rec.alternative, `<span class="result-badge">${esc(t(rec.capacityShort ? "results.badge.next" : "results.badge.alt"))}</span>`, "secondary")
       : "",
     rec.premium
       ? resultCard(rec.premium, `<span class="result-badge">${esc(t("results.badge.premium"))}</span>`, "secondary")

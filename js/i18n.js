@@ -97,6 +97,7 @@ export const STRINGS = {
     "results.badge.primary": "Empfehlung",
     "results.badge.primaryOver": "Günstigste machbare Lösung (über Budget)",
     "results.badge.alt": "Sparsame Alternative",
+    "results.badge.next": "Nächstbeste Option",
     "results.badge.premium": "Premium-Option",
     "results.model": "Modell",
     "results.hardware": "Hardware",
@@ -114,7 +115,7 @@ export const STRINGS = {
     "results.budgetMiss":
       "In deinem Budget gibt es keine Konfiguration, die den Bedarf erfüllt. Unten siehst du die günstigste machbare Lösung — oder geh bei der Modellqualität eine Stufe runter.",
     "results.capacityShort":
-      "Kein einzelnes System im Katalog deckt diesen Bedarf voll ab. Gezeigt wird die Option mit der höchsten Kapazität — für mehr braucht es ein individuell geplantes Cluster.",
+      "Kein einzelnes System im Katalog deckt diesen Bedarf voll ab. Gezeigt werden die stärksten Optionen aus dem Katalog — für mehr braucht es ein individuell geplantes Cluster.",
     "results.caveatsTitle": "Wichtige Hinweise — bitte lesen",
     "results.none":
       "Für diese Kombination gibt es keine sinnvolle Empfehlung. Probier andere Angaben.",
@@ -384,6 +385,7 @@ export const STRINGS = {
     "results.badge.primary": "Recommendation",
     "results.badge.primaryOver": "Cheapest viable option (over budget)",
     "results.badge.alt": "Budget alternative",
+    "results.badge.next": "Next-best option",
     "results.badge.premium": "Premium option",
     "results.model": "Model",
     "results.hardware": "Hardware",
@@ -401,7 +403,7 @@ export const STRINGS = {
     "results.budgetMiss":
       "No configuration within your budget meets this need. Below is the cheapest viable option — or step down one model-quality tier.",
     "results.capacityShort":
-      "No single catalog system fully covers this demand. Shown is the highest-capacity option — beyond that you need an individually planned cluster.",
+      "No single catalog system fully covers this demand. Shown are the strongest catalog options — beyond that you need an individually planned cluster.",
     "results.caveatsTitle": "Important caveats — please read",
     "results.none":
       "There is no sensible recommendation for this combination. Try different inputs.",

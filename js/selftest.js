@@ -199,6 +199,29 @@ export function run() {
   check("H200 node faster than 8x PRO 6000 (NVLink, no PCIe penalty)",
     h200TokS > proNodeTokS, `${h200TokS.toFixed(1)} vs ${proNodeTokS.toFixed(1)}`);
 
+  // --- H200 as a winnable recommendation ---
+  // 250 pure-chat users need 32 streams: the H200 node covers that and is
+  // cheaper than the 3-node cluster, so it wins as a regular primary.
+  const recChat250 = recommend({ users: 250, useCase: "chat", sovereignty: "hard", budgetId: "b5", quality: "best" });
+  check("250 chat users: no capacity shortfall", !recChat250.capacityShort,
+    recChat250.primary?.hw.id);
+  check("250 chat users: primary = H200 node", recChat250.primary?.hw.id === "node-8x-h200",
+    recChat250.primary?.hw.id);
+
+  // Agentic-heavy 250 users blow past every system: shortfall shows the two
+  // strongest options on different hardware (H200 node + redundant cluster).
+  const recMix250 = recommend({
+    users: 250, mix: { chat: 40, rag: 10, coding: 30, agentic: 20 },
+    sovereignty: "hard", budgetId: "b5", quality: "best",
+  });
+  check("250 mixed users: capacity shortfall", recMix250.capacityShort === true);
+  const shortIds = [recMix250.primary?.hw.id, recMix250.alternative?.hw.id];
+  check("Shortfall shows two different systems",
+    !!recMix250.alternative && shortIds[0] !== shortIds[1], shortIds.join(" + "));
+  check("Shortfall includes H200 node and 3-node cluster",
+    shortIds.includes("node-8x-h200") && shortIds.includes("cluster-3node"),
+    shortIds.join(" + "));
+
   // --- Mix slider auto-balance: equal spread, clamping, un-stuck zeros ---
   const sum = (a) => a.reduce((s, n) => s + n, 0);
   const eq = rebalanceMix([49, 14, 37, 0], 3, 12);

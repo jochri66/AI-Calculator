@@ -279,6 +279,7 @@ export function recommend(answers) {
   if (!primary) {
     capacityShort = true;
     let best = null;
+    let runnerUp = null; // best option on DIFFERENT hardware, so a real choice shows
     // Most users served; ties broken by cheaper hardware, then higher model tier.
     const better = (a, b) =>
       a.maxUsers - b.maxUsers ||
@@ -287,12 +288,22 @@ export function recommend(answers) {
     for (const model of models) {
       for (const hw of HARDWARE) {
         const opt = buildOption({ model, quant: "q4", hw, cap: null, price: hw.priceEUR[0], inBudget: hw.priceEUR[0] <= budgetMax }, blend);
-        if (opt.maxUsefulStreams > 0 && (!best || better(opt, best) > 0)) best = opt;
+        if (opt.maxUsefulStreams <= 0) continue;
+        if (!best || better(opt, best) > 0) {
+          if (best && best.hw.id !== opt.hw.id) runnerUp = best;
+          best = opt;
+        } else if (opt.hw.id !== best.hw.id && (!runnerUp || better(opt, runnerUp) > 0)) {
+          runnerUp = opt;
+        }
       }
     }
     if (best) {
       best.cap = capacity(best.model, best.quant, ctx, best.hw, best.maxUsefulStreams);
       primary = best;
+    }
+    if (runnerUp) {
+      runnerUp.cap = capacity(runnerUp.model, runnerUp.quant, ctx, runnerUp.hw, runnerUp.maxUsefulStreams);
+      alternative = runnerUp;
     }
   }
 
